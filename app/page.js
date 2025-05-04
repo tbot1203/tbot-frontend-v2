@@ -292,7 +292,7 @@ export default function Home() {
                   ))}
                 </Row>
               )} */}
-              <div className="api-status-container d-flex justify-content-between flex-wrap mb-4">
+              <div className="api-status-container d-flex flex-wrap mb-4">
                 {[
                   { name: "OpenRouter", status: true },
                   { name: "Social Data", status: true },

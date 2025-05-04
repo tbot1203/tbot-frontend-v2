@@ -307,6 +307,7 @@ body{
 }
 
 .api-status-container {
+  justify-content: space-between !important;
   margin-left: auto;
   margin-right: auto;
   max-width: 56.25%;
@@ -447,6 +448,13 @@ body{
   }
 
 }
+
+@media (max-width: 1495px) {
+  .api-status-container{
+    justify-content: center !important;
+  }
+}
+
 
 @media (max-width: 770px) {
   .btn-account-ps2{
