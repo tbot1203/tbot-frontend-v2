@@ -451,6 +451,7 @@ body{
 
 @media (max-width: 1495px) {
   .api-status-container{
+    margin-top: 50px;
     justify-content: center !important;
   }
 }
@@ -464,4 +465,11 @@ body{
     margin-right: -20px !important;
   }
 
+}
+
+
+@media (max-width: 660px) {
+  .hide-on-mobile {
+    display: none !important;
+  }
 }

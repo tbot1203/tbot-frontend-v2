@@ -328,8 +328,8 @@ export default function Home() {
                     <thead>
                       <tr>
                         <th>Account</th>
-                        <th>Rate Limit</th>
-                        <th>Followers</th>
+                        <th className="hide-on-mobile">Rate Limit</th>
+                        <th className="hide-on-mobile">Followers</th>
                         <th>To Be Posted</th>
                         <th>Process</th>
                       </tr>
@@ -341,8 +341,8 @@ export default function Home() {
                             <img src={acc.profile_pic || "https://avatar.iran.liara.run/public/boy"} alt="avatar" className="avatar" />
                             <span className="username-td">@{acc.username}</span>
                           </td>
-                          <td onClick={() => window.location.href = `/account/${acc.twitter_id}`}>{acc.rate_limit} per hour</td>
-                          <td onClick={() => window.location.href = `/account/${acc.twitter_id}`}>{acc.followers}</td>
+                          <td className="hide-on-mobile" onClick={() => window.location.href = `/account/${acc.twitter_id}`}>{acc.rate_limit} per hour</td>
+                          <td className="hide-on-mobile" onClick={() => window.location.href = `/account/${acc.twitter_id}`}>{acc.followers}</td>
                           <td>
                             <span className="bubble" onClick={() => window.location.href = `/tweets/${acc.id}`}>
                               {acc.collected_tweets}
