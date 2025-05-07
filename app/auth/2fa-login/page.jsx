@@ -22,6 +22,7 @@ export default function TwoFALogin() {
         window.location.href = "/admin"; // Redirigir al login
     };
     
+    
     const toggleSidebar = () => {
         setSidebarOpen((prev) => !prev);
     };
