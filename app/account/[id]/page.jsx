@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { Container, Row, Nav, Navbar, Spinner, Button, Badge, Modal, Form, Alert } from "react-bootstrap";
-import { House, ChatText, Monitor, Key, Prohibit, List, TwitterLogo, SignOut, ArrowClockwise, Gear  } from "phosphor-react";
+import { House, ChatText, Monitor, Key, Prohibit, List, PencilSimple, TwitterLogo, SignOut, ArrowClockwise, Gear  } from "phosphor-react";
 import './style.css';
 import "bootstrap/dist/css/bootstrap.min.css";
 
@@ -29,7 +29,18 @@ export default function Home() {
     const [twitterId, setTwitterId] = useState("");
     const [isSaving, setIsSaving] = useState(false);
     const [showSettings, setShowSettings] = useState(false);
+    const [showEditProfile, setShowEditProfile] = useState(false);
+    const [newUsername, setNewUsername] = useState("");
+    const [newProfilePic, setNewProfilePic] = useState("");
+    const [notes, setNotes] = useState("");
 
+    const handleOpenEditProfile = () => {
+        setNewUsername(userInfo.username || "");
+        setNewProfilePic(userInfo.profile_pic || "");
+        setShowEditProfile(true);
+    };
+    
+    const handleCloseEditProfile = () => setShowEditProfile(false);    
     const handleOpenSettings = () => setShowSettings(true);
     const handleCloseSettings = () => setShowSettings(false);
 
@@ -94,6 +105,7 @@ export default function Home() {
                     setUsers(data.monitored_users.map((mu) => mu.twitter_username));
                     setUserInfo(data.user);
                     setCustomStyle(data.user.custom_style || "");
+                    setNotes(data.user.notes || "");
                     setSelectedLanguage(data.user.language || "English");
                     setKeywords(data.keywords);
                     setPosts(data.total_posts);
@@ -149,7 +161,8 @@ export default function Home() {
             custom_style: customStyle,
             monitored_users: users,
             keywords: keywords,
-            extraction_filter: extractionFilter
+            extraction_filter: extractionFilter,
+            notes: notes
         };
     
         try {
@@ -334,7 +347,11 @@ export default function Home() {
                                 <img src={userInfo.profile_pic || "https://avatar.iran.liara.run/public/boy"} alt="Profile" className="profile-avatar" />
 
                                 <div className="profile-info">
-                                    <h5 className="profile-name mb-2">@{userInfo.username}</h5>
+                                    <h5 className="profile-name mb-2 d-flex align-items-center">@{userInfo.username}
+                                        {/* <span className="button-edit" onClick={handleOpenEditProfile}>
+                                            <PencilSimple/>
+                                        </span> */}
+                                    </h5>
                                     <div className="profile-stats d-flex flex-wrap justify-content-center justify-content-md-start gap-3">
                                     <div>
                                         <span className="label">Followers</span>
@@ -530,6 +547,61 @@ export default function Home() {
                 </div>
             </div>
 
+            <Modal className='modal-edit' show={showEditProfile} onHide={handleCloseEditProfile} centered>
+                <Modal.Header closeButton>
+                    <Modal.Title className="title-modal">Edit Profile</Modal.Title>
+                </Modal.Header>
+                <Modal.Body className="text-center">
+
+                    <div className="position-relative d-inline-block mb-3">
+                    <img 
+                        src={newProfilePic || "https://avatar.iran.liara.run/public/boy"} 
+                        alt="Profile" 
+                        className="edit-avatar"
+                    />
+                    <label className="change-photo-btn">
+                        <input 
+                        type="file" 
+                        accept="image/*" 
+                        onChange={(e) => {
+                            const file = e.target.files[0];
+                            if (file) {
+                            const reader = new FileReader();
+                            reader.onloadend = () => {
+                                setNewProfilePic(reader.result.toString());
+                            };
+                            reader.readAsDataURL(file);
+                            }
+                        }} 
+                        />
+                        <PencilSimple size={18} />
+                    </label>
+                    </div>
+
+                    <Form.Group controlId="usernameEdit" className="mb-3">
+                    <Form.Control
+                        type="text"
+                        className="input-username-edit"
+                        value={newUsername}
+                        onChange={(e) => setNewUsername(e.target.value)}
+                        placeholder="Enter new username"
+                    />
+                    </Form.Group>
+
+                    <Button 
+                    variant="primary" 
+                    className="button-update-edit btn-style-1 w-100"
+                    onClick={() => {
+                        // CAMBIAR ACA EN EL BACKEND
+                        setUserInfo({ ...userInfo, username: newUsername, profile_pic: newProfilePic });
+                        setShowEditProfile(false);
+                    }}
+                    >
+                    Update
+                    </Button>
+                </Modal.Body>
+                </Modal>
+
 
             <Modal show={showSettings} onHide={handleCloseSettings} centered>
                 <Modal.Header closeButton>
@@ -551,16 +623,14 @@ export default function Home() {
                     </div>
 
                     {/* <div>
-                    <h6>Wait time</h6>
-                    <Form.Select
-                        value={rateLimit}
-                        onChange={handleRateLimitChange}
-                    >
-                        {Array.from({ length: 10 }, (_, i) => i + 1).map((val) => (
-                        <option key={val} value={val}>{val}</option>
-                        ))}
-                    </Form.Select>
-                    <small className="text-muted">Select the wait time per tweets you want</small>
+                    <h6>Notes</h6>
+                    <Form.Control
+                        type="text"
+                        className="input-notes"
+                        value={notes}
+                        onChange={(e) => setNotes(e.target.value)}
+                        placeholder="Enter account notes"
+                    />
                     </div> */}
                 </Modal.Body>
             </Modal>

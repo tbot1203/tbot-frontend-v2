@@ -4,7 +4,64 @@ body{
     background-color: #FFFFFF !important;
 }
 
+.edit-avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+}
 
+.button-update-edit{
+  background-color: #5896EB !important;
+  border: none !important;
+  height: 45px;
+  border-radius: 4px !important;
+}
+
+.input-username-edit{
+  border-radius: 4px !important;
+  height: 46px;
+  margin-top: 5px;
+  margin-bottom: 30px;
+}
+
+.modal-edit{
+  font-family: 'Poppins', sans-serif;
+}
+
+.input-notes{
+  padding-top: 10px !important;
+  padding-bottom: 50px !important;
+}
+
+.change-photo-btn {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background-color: #5896EB;
+  color: white;
+  border-radius: 50%;
+  padding: 5px;
+  width: 35px;
+  cursor: pointer;
+}
+
+.change-photo-btn input {
+  display: none;
+}
+
+.button-edit {
+  margin-left: 12.5px;
+  border-radius: 50%;
+  color: white;
+  height: 35px; /* Tamaño razonable para íconos */
+  width: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #5896EB;
+  cursor: pointer;
+}
 
 .textl:hover{
     color: #215eb4;
