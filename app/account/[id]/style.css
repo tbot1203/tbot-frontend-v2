@@ -32,6 +32,12 @@ body{
 .input-notes{
   padding-top: 10px !important;
   padding-bottom: 50px !important;
+  font-size: 15px !important;
+}
+
+.title-section-init{
+  margin-top: 50px !important;
+  margin-bottom: -50px !important;
 }
 
 .change-photo-btn {
@@ -273,8 +279,13 @@ body{
   }
 
   .i2{
-    margin-top: 100px;
+    margin-top: 10px;
   }
+  
+  .rate-block {
+    width: 120px !important;
+    max-width: 120px;
+}
 
   .row-badge {
     display: grid;

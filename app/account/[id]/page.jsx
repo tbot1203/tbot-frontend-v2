@@ -14,14 +14,23 @@ export default function Home() {
     const pathname = usePathname();
     const [languages, setLanguages] = useState([]);
     const [posts, setPosts] = useState([]);
-    const [rateLimit, setRateLimit] = useState("");  
-    const [extractionFilter, setExtractionFilter] = useState("");
+    const [rateLimit, setRateLimit] = useState(0);  
+    const [likesLimit, setLikesLimit] = useState(0);  
+    const [commentsLimit, setCommentsLimit] = useState(0);  
+    const [retweetsLimit, setRetweetsLimit] = useState(0);  
+    const [likes, setLikes] = useState([]);  
+    const [comments, setComments] = useState([]);  
+    const [retweets, setRetweets] = useState([]);  
+    const [extractionFilter, setExtractionFilter] = useState(0);
     const [isRefreshing, setIsRefreshing] = useState(false);
-
+    const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
     const [users, setUsers] = useState([]);
     const [keywords, setKeywords] = useState([]);
     const [userInput, setUserInput] = useState("");
     const [keywordInput, setKeywordInput] = useState("");
+    const [commentInput, setCommentInput] = useState("");
+    const [likeInput, setLikeInput] = useState("");
+    const [retweetInput, setRetweetInput] = useState("");
     const [userInfo, setUserInfo] = useState("");
     const [customStyle, setCustomStyle] = useState(""); 
     const [selectedLanguage, setSelectedLanguage] = useState("");
@@ -33,6 +42,7 @@ export default function Home() {
     const [newUsername, setNewUsername] = useState("");
     const [newProfilePic, setNewProfilePic] = useState("");
     const [notes, setNotes] = useState("");
+    const [selectedMethod, setSelectedMethod] = useState(null);
 
     const handleOpenEditProfile = () => {
         setNewUsername(userInfo.username || "");
@@ -108,8 +118,15 @@ export default function Home() {
                     setNotes(data.user.notes || "");
                     setSelectedLanguage(data.user.language || "English");
                     setKeywords(data.keywords);
+                    setLikes(data.likes.map((l) => l.twitter_username));
+                    setComments(data.comments.map((c) => c.twitter_username));
+                    setRetweets(data.retweets.map((r) => r.twitter_username));
                     setPosts(data.total_posts);
                     setExtractionFilter(data.user.extraction_filter || "cb1"); // suponiendo que lo trae así
+                    setLikesLimit(data.user.likes_limit);
+                    setCommentsLimit(data.user.comments_limit);
+                    setRetweetsLimit(data.user.retweets_limit);
+                    setSelectedMethod(data.user.extraction_method);
 
                     // 2️⃣ Solo si fetchUser fue exitoso, seguimos con fetchRateLimit
                     const rateResp = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/logs/get_rate_limit?twitter_id=${twitterId}`);
@@ -135,6 +152,10 @@ export default function Home() {
     }, [pathname]);
     
 
+    const handleMethodChange = (e) => {
+        const method = Number(e.target.value);  // convierte "1" → 1
+        setSelectedMethod(method);
+    };
     
     const handleLogout = () => {
         document.cookie = "auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
@@ -162,7 +183,14 @@ export default function Home() {
             monitored_users: users,
             keywords: keywords,
             extraction_filter: extractionFilter,
-            notes: notes
+            notes: notes,
+            likes_limit: likesLimit,
+            comments_limit: commentsLimit,
+            retweets_limit: retweetsLimit,
+            retweets: retweets,
+            comments: comments,
+            likes: likes,
+            extraction_method: selectedMethod,
         };
     
         try {
@@ -215,6 +243,15 @@ export default function Home() {
     const handleRateLimitChange = (e) => {
         setRateLimit(e.target.value);
     };
+    const handleLikesLimitChange = (e) => {
+        setLikesLimit(e.target.value);
+    };
+    const handleCommentsLimitChange = (e) => {
+        setCommentsLimit(e.target.value);
+    };
+    const handleRetweetsLimitChange = (e) => {
+        setRetweetsLimit(e.target.value);
+    };
 
     const toggleSidebar = () => {
         setSidebarOpen((prev) => !prev);
@@ -236,6 +273,26 @@ export default function Home() {
         }
     };
 
+    const handleLikeKeyDown = (e) => {
+        if (e.key === "Enter" && likeInput.trim() !== "") {
+            setLikes([...likes, likeInput.trim()]);
+            setLikeInput(""); // Limpiar input
+        }
+    };
+
+    const handleCommentKeyDown = (e) => {
+        if (e.key === "Enter" && commentInput.trim() !== "") {
+            setComments([...comments, commentInput.trim()]);
+            setCommentInput(""); // Limpiar input
+        }
+    };
+
+    const handleRetweetKeyDown = (e) => {
+        if (e.key === "Enter" && retweetInput.trim() !== "") {
+            setRetweets([...retweets, retweetInput.trim()]);
+            setRetweetInput(""); // Limpiar input
+        }
+    };
     // Función para eliminar un usuario de la lista
     const removeUser = (index) => {
         setUsers(users.filter((_, i) => i !== index));
@@ -244,6 +301,18 @@ export default function Home() {
     // Función para eliminar una keyword de la lista
     const removeKeyword = (index) => {
         setKeywords(keywords.filter((_, i) => i !== index));
+    };
+
+    const removeLike = (index) => {
+        setLikes(likes.filter((_, i) => i !== index));
+    };
+
+    const removeComment = (index) => {
+        setComments(comments.filter((_, i) => i !== index));
+    };
+
+    const removeRetweet = (index) => {
+        setRetweets(retweets.filter((_, i) => i !== index));
     };
 
     if (loading) {
@@ -348,9 +417,9 @@ export default function Home() {
 
                                 <div className="profile-info">
                                     <h5 className="profile-name mb-2 d-flex align-items-center">@{userInfo.username}
-                                        {/* <span className="button-edit" onClick={handleOpenEditProfile}>
+                                        <span className="button-edit" onClick={handleOpenEditProfile}>
                                             <PencilSimple/>
-                                        </span> */}
+                                        </span>
                                     </h5>
                                     <div className="profile-stats d-flex flex-wrap justify-content-center justify-content-md-start gap-3">
                                     <div>
@@ -381,6 +450,7 @@ export default function Home() {
                             </div>
                         </div>
 
+                            <h1 className="d-flex justify-content-center  title-function mb-4">Monitored Accounts</h1>
 
                             {/* Input de Users */}
                             <div className="d-flex justify-content-center col-12 col-md-12">
@@ -399,15 +469,18 @@ export default function Home() {
                             {users.map((user, index) => (
                                 <div key={index}>
                                 <Badge pill bg="" className="badge-style">
-                                    <span onClick={() => removeKeyword(index)} style={{ cursor: "pointer" }}>✖</span> @{user}
+                                    <span onClick={() => removeUser(index)} style={{ cursor: "pointer" }}>✖</span> @{user}
                                 </Badge>
                                 </div>
                             ))}
                             </div>
 
                             {/* Input de Keywords */}
+                            <h1 className="d-flex justify-content-center title-section-init title-function mb-4">Monitored Keywords</h1>
+                            
                             <div className="d-flex justify-content-center col-12 col-md-12">
-                                <input
+
+                            <input
                                     className="input-style-1 i2"
                                     placeholder="Write the keyword you want to analyze and press Enter Key."
                                     name="keywords"
@@ -436,9 +509,7 @@ export default function Home() {
                                         { id: 'cb1', label: 'All Tweets' },
                                         { id: 'cb2', label: 'Image Only' },
                                         { id: 'cb3', label: 'Video Only' },
-                                        { id: 'cb4', label: 'Image and Video' },
-                                        { id: 'cb5', label: 'Text and Image' },
-                                        { id: 'cb6', label: 'Text Only' },
+                                        { id: 'cb4', label: 'Image and Video' }
                                     ].map(({ id, label }) => (
                                         <div className="col-auto" key={id}>
                                         <input
@@ -459,27 +530,30 @@ export default function Home() {
                                 <h1 className="title-function">Test Title</h1>
                             </div> */}
 
-                            {/* <div className="new-section container text-center mt-5">
+                            <div className="new-section container text-center mt-5">
                                 <h1 className="title-function">Select an Extraction Method</h1>
                                 <div className="filter-toggle-group d-flex flex-wrap justify-content-center gap-2">
-                                    <div className="col-auto">
-                                    <input type="radio" className="filter-radio-input" name="method" id="method1" autoComplete="off" disabled/>
-                                    <label className="filter-radio-label" htmlFor="method1">Method 1</label>
+                                    {[1, 2, 3].map((num) => (
+                                    <div className="col-auto" key={num}>
+                                        <input
+                                        type="radio"
+                                        className="filter-radio-input"
+                                        name="method"
+                                        id={`method${num}`}
+                                        autoComplete="off"
+                                        value={num}  
+                                        checked={selectedMethod === num}
+                                        onChange={handleMethodChange}
+                                        />
+                                        <label className="filter-radio-label" htmlFor={`method${num}`}>
+                                        Method {num}
+                                        </label>
                                     </div>
-
-                                    <div className="col-auto">
-                                    <input type="radio" className="filter-radio-input" name="method" id="method2" autoComplete="off" disabled />
-                                    <label className="filter-radio-label" htmlFor="method2" >Method 2</label>
-                                    </div>
-
-                                    <div className="col-auto">
-                                    <input type="radio" className="filter-radio-input" name="method" id="method3" autoComplete="off" disabled/>
-                                    <label className="filter-radio-label" htmlFor="method3" >Method 3</label>
-                                    </div>
+                                    ))}
 
                                 </div>
 
-                            </div> */}
+                            </div>
 
 
                             <div className="new-section container text-center mt-5">
@@ -490,30 +564,141 @@ export default function Home() {
                                 placeholder="Customize your tweets however you prefer..." name="style-prompt" type="text" />
                             </div>
 
-                            <div className="new-section container text-center mt-5">
-                                <h1 className="title-function">Rate Limits</h1>
-                                <div className="d-flex justify-content-center">
-                                    <input 
-                                        type="number" 
-                                        className="input-rate"
-                                        value={rateLimit}
-                                        onChange={handleRateLimitChange}
-                                        min="1"
-                                        max="10"
-                                    />
-                                    <p className="p-api">Posts Per Hour</p>
-                                </div>
-                                {/* <div className="d-flex justify-content-center">
-                                    <input 
-                                        type="number" 
-                                        className="input-rate2"
-                                        min="1"
-                                    />
-                                    <p className="p-api">Posts Per Day</p>
-                                </div> */}
+                         {/* Input de Likes */}
+                         <h1 className="d-flex justify-content-center title-section-init title-function mb-4">Random Likes</h1>
+                            
+                            <div className="d-flex justify-content-center col-12 col-md-12">
 
+                            <input
+                                    className="input-style-1 i2"
+                                    placeholder="Write the users you want to like and press Enter Key."
+                                    name="keywords"
+                                    type="text"
+                                    value={likeInput}
+                                    onChange={(e) => setLikeInput(e.target.value)}
+                                    onKeyDown={handleLikeKeyDown}
+                                />
                             </div>
 
+                            {/* Badges de Keywords */}
+                            <div className="row-badge">
+                            {likes.map((keyword, index) => (
+                                <div key={index}>
+                                <Badge pill bg="" className="badge-style">
+                                    <span onClick={() => removeLike(index)} style={{ cursor: "pointer" }}>✖</span> @{keyword}
+                                </Badge>
+                                </div>
+                            ))}
+                            </div>
+
+                         {/* Input de Comments */}
+                         <h1 className="d-flex justify-content-center title-section-init title-function mb-4">Random Comments</h1>
+                            
+                            <div className="d-flex justify-content-center col-12 col-md-12">
+
+                            <input
+                                    className="input-style-1 i2"
+                                    placeholder="Write the users you want to comment and press Enter Key."
+                                    name="keywords"
+                                    type="text"
+                                    value={commentInput}
+                                    onChange={(e) => setCommentInput(e.target.value)}
+                                    onKeyDown={handleCommentKeyDown}
+                                />
+                            </div>
+
+                            {/* Badges de Keywords */}
+                            <div className="row-badge">
+                            {comments.map((keyword, index) => (
+                                <div key={index}>
+                                <Badge pill bg="" className="badge-style">
+                                    <span onClick={() => removeComment(index)} style={{ cursor: "pointer" }}>✖</span> @{keyword}
+                                </Badge>
+                                </div>
+                            ))}
+                            </div>
+
+
+                         {/* Input de Retweets */}
+                         <h1 className="d-flex justify-content-center title-section-init title-function mb-4">Random Retweets</h1>
+                            
+                            <div className="d-flex justify-content-center col-12 col-md-12">
+
+                            <input
+                                    className="input-style-1 i2"
+                                    placeholder="Write the users you want to retweet and press Enter Key."
+                                    name="keywords"
+                                    type="text"
+                                    value={retweetInput}
+                                    onChange={(e) => setRetweetInput(e.target.value)}
+                                    onKeyDown={handleRetweetKeyDown}
+                                />
+                            </div>
+
+                            {/* Badges de Keywords */}
+                            <div className="row-badge">
+                            {retweets.map((keyword, index) => (
+                                <div key={index}>
+                                <Badge pill bg="" className="badge-style">
+                                    <span onClick={() => removeRetweet(index)} style={{ cursor: "pointer" }}>✖</span> @{keyword}
+                                </Badge>
+                                </div>
+                            ))}
+                            </div>
+
+                            <div className="new-section container text-center mt-5">
+                                <h1 className="title-function">Rate Limits</h1>
+
+                                <div className="d-flex flex-wrap justify-content-center gap-4 mb-3">
+                                    <div className="rate-block d-flex flex-column align-items-center">
+                                        <p className="p-api mb-1">Posts Per Hour</p>
+                                        <input 
+                                            type="number" 
+                                            className="form-control"
+                                            value={rateLimit}
+                                            onChange={handleRateLimitChange}
+                                            min="1"
+                                            max="10"
+                                        />
+                                    </div>
+                                    <div className="rate-block d-flex flex-column align-items-center">
+                                        <p className="p-api mb-1">Likes</p>
+                                        <input 
+                                            type="number" 
+                                            className="form-control"
+                                            value={likesLimit}
+                                            onChange={handleLikesLimitChange}
+                                            min="1"
+                                            max="10"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="d-flex flex-wrap justify-content-center gap-4">
+                                    <div className="rate-block d-flex flex-column align-items-center">
+                                        <p className="p-api mb-1">Comments</p>
+                                        <input 
+                                            type="number" 
+                                            className="form-control"
+                                            value={commentsLimit}
+                                            onChange={handleCommentsLimitChange}
+                                            min="1"
+                                            max="10"
+                                        />
+                                    </div>
+                                    <div className="rate-block d-flex flex-column align-items-center">
+                                        <p className="p-api mb-1">Retweets</p>
+                                        <input 
+                                            type="number" 
+                                            className="form-control"
+                                            value={retweetsLimit}
+                                            onChange={handleRetweetsLimitChange}
+                                            min="1"
+                                            max="10"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
 
 
                             <div className="d-flex justify-content-center col-12 col-md-12">
@@ -589,21 +774,53 @@ export default function Home() {
                     </Form.Group>
 
                     <Button 
-                    variant="primary" 
-                    className="button-update-edit btn-style-1 w-100"
-                    onClick={() => {
-                        // CAMBIAR ACA EN EL BACKEND
-                        setUserInfo({ ...userInfo, username: newUsername, profile_pic: newProfilePic });
-                        setShowEditProfile(false);
-                    }}
+                        variant="primary" 
+                        className="button-update-edit btn-style-1 w-100"
+                        disabled={isUpdatingProfile}
+                        onClick={async () => {
+                            setIsUpdatingProfile(true);
+                            try {
+                                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/account/${twitterId}/update-profile`, {
+                                    method: "PUT",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify({
+                                        username: newUsername,
+                                        profile_pic: newProfilePic
+                                    }),
+                                });
+
+                                const data = await res.json();
+
+                                if (!res.ok) {
+                                    alert("❌ Error al actualizar perfil: " + data.error);
+                                    return;
+                                }
+
+                                setUserInfo({ ...userInfo, username: newUsername, profile_pic: newProfilePic });
+                                setShowEditProfile(false);
+
+                            } catch (err) {
+                                console.error("Error al actualizar perfil:", err);
+                                alert("❌ Error inesperado.");
+                            } finally {
+                                setIsUpdatingProfile(false);
+                            }
+                        }}
                     >
-                    Update
+                        {isUpdatingProfile ? (
+                            <>
+                                <Spinner animation="border" size="sm" role="status" className="me-2" />
+                                Updating...
+                            </>
+                        ) : (
+                            "Update"
+                        )}
                     </Button>
                 </Modal.Body>
                 </Modal>
 
 
-            <Modal show={showSettings} onHide={handleCloseSettings} centered>
+            <Modal className='modal-edit' show={showSettings} onHide={handleCloseSettings} centered>
                 <Modal.Header closeButton>
                     <Modal.Title className="title-modal">Settings</Modal.Title>
                 </Modal.Header>
@@ -622,8 +839,8 @@ export default function Home() {
                     <small className="modal-text text-muted">Choose the language in which you want to post.</small>
                     </div>
 
-                    {/* <div>
-                    <h6>Notes</h6>
+                    <div>
+                    <h6 className="h-modal">Notes</h6>
                     <Form.Control
                         type="text"
                         className="input-notes"
@@ -631,7 +848,7 @@ export default function Home() {
                         onChange={(e) => setNotes(e.target.value)}
                         placeholder="Enter account notes"
                     />
-                    </div> */}
+                    </div>
                 </Modal.Body>
             </Modal>
 
