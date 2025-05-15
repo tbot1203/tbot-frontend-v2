@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import { Container, Row, Nav, Navbar, Spinner, Button, Badge, Modal, Form, Alert } from "react-bootstrap";
+import { Container, Row, Nav, Navbar, Spinner, Button, Badge, Modal, Form, Alert, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { House, ChatText, Monitor, Key, Prohibit, List, PencilSimple, TwitterLogo, SignOut, ArrowClockwise, Gear  } from "phosphor-react";
 import './style.css';
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -468,9 +468,18 @@ export default function Home() {
                             <div className="row-badge">
                             {users.map((user, index) => (
                                 <div key={index}>
-                                <Badge pill bg="" className="badge-style">
-                                    <span onClick={() => removeUser(index)} style={{ cursor: "pointer" }}>✖</span> @{user}
-                                </Badge>
+                                <OverlayTrigger
+                                    placement="top"
+                                    overlay={
+                                        <Tooltip id={`user-tooltip-${index}`}>
+                                            @{user}
+                                        </Tooltip>
+                                    }
+                                >
+                                    <Badge pill bg="" className="badge-style" style={{ cursor: "pointer" }}>
+                                        <span onClick={() => removeUser(index)} style={{ cursor: "pointer" }}>✖</span> @{user}
+                                    </Badge>
+                                </OverlayTrigger>
                                 </div>
                             ))}
                             </div>
@@ -495,9 +504,18 @@ export default function Home() {
                             <div className="row-badge">
                             {keywords.map((keyword, index) => (
                                 <div key={index}>
-                                <Badge pill bg="" className="badge-style">
-                                    <span onClick={() => removeKeyword(index)} style={{ cursor: "pointer" }}>✖</span> {keyword}
-                                </Badge>
+                                <OverlayTrigger
+                                    placement="top"
+                                    overlay={
+                                        <Tooltip id={`tooltip-${index}`}>
+                                            {keyword}
+                                        </Tooltip>
+                                    }
+                                >
+                                    <Badge pill bg="" className="badge-style" style={{ cursor: "pointer" }}>
+                                        <span onClick={() => removeKeyword(index)} style={{ cursor: "pointer" }}>✖</span> {keyword}
+                                    </Badge>
+                                </OverlayTrigger>
                                 </div>
                             ))}
                             </div>
@@ -584,9 +602,18 @@ export default function Home() {
                             <div className="row-badge">
                             {likes.map((keyword, index) => (
                                 <div key={index}>
-                                <Badge pill bg="" className="badge-style">
-                                    <span onClick={() => removeLike(index)} style={{ cursor: "pointer" }}>✖</span> @{keyword}
-                                </Badge>
+                                <OverlayTrigger
+                                    placement="top"
+                                    overlay={
+                                        <Tooltip id={`like-tooltip-${index}`}>
+                                            @{keyword}
+                                        </Tooltip>
+                                    }
+                                >
+                                    <Badge pill bg="" className="badge-style" style={{ cursor: "pointer" }}>
+                                        <span onClick={() => removeLike(index)} style={{ cursor: "pointer" }}>✖</span> @{keyword}
+                                    </Badge>
+                                </OverlayTrigger>
                                 </div>
                             ))}
                             </div>
@@ -611,9 +638,18 @@ export default function Home() {
                             <div className="row-badge">
                             {comments.map((keyword, index) => (
                                 <div key={index}>
-                                <Badge pill bg="" className="badge-style">
-                                    <span onClick={() => removeComment(index)} style={{ cursor: "pointer" }}>✖</span> @{keyword}
-                                </Badge>
+                                <OverlayTrigger
+                                    placement="top"
+                                    overlay={
+                                        <Tooltip id={`comment-tooltip-${index}`}>
+                                            @{keyword}
+                                        </Tooltip>
+                                    }
+                                >
+                                    <Badge pill bg="" className="badge-style" style={{ cursor: "pointer" }}>
+                                        <span onClick={() => removeComment(index)} style={{ cursor: "pointer" }}>✖</span> @{keyword}
+                                    </Badge>
+                                </OverlayTrigger>
                                 </div>
                             ))}
                             </div>
@@ -639,9 +675,18 @@ export default function Home() {
                             <div className="row-badge">
                             {retweets.map((keyword, index) => (
                                 <div key={index}>
-                                <Badge pill bg="" className="badge-style">
-                                    <span onClick={() => removeRetweet(index)} style={{ cursor: "pointer" }}>✖</span> @{keyword}
-                                </Badge>
+                                <OverlayTrigger
+                                    placement="top"
+                                    overlay={
+                                        <Tooltip id={`retweet-tooltip-${index}`}>
+                                            @{keyword}
+                                        </Tooltip>
+                                    }
+                                >
+                                    <Badge pill bg="" className="badge-style" style={{ cursor: "pointer" }}>
+                                        <span onClick={() => removeRetweet(index)} style={{ cursor: "pointer" }}>✖</span> @{keyword}
+                                    </Badge>
+                                </OverlayTrigger>
                                 </div>
                             ))}
                             </div>
