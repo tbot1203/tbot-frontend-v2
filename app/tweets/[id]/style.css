@@ -52,10 +52,21 @@ body{
   width: 15%;
 }
 
+.btn-d3{
+  margin-right: 3% !important;
+  border-radius: 50px !important;
+  width: 17%;
+  background-color: #007bff !important;
+  border: 1px solid #007bff !important;
+  color: white !important;
+}
+
+.title-priority{
+  font-size: 18px !important;
+}
 
 .btn-d2{
   border-radius: 50px !important;
-  margin-left: 3% !important;
   width: 15%;
   background-color: white !important;
   color: red !important;
@@ -239,13 +250,30 @@ body{
     margin-left: 250px;
   }
 
+  @media (max-width: 1784px) {
+    .btn-d1{
+      width: 50%;
+    }
+    
+    .btn-d3{
+      width: 50%;
+    }
+
+    .btn-d2{
+      width: 50%;
+    }
+  
+  }
 
   @media (max-width: 991px) {
     .btn-d1{
       width: 50%;
     }
     
-    
+    .btn-d3{
+      width: 50%;
+    }
+
     .btn-d2{
       width: 50%;
     }

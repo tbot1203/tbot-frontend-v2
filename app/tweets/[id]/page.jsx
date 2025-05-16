@@ -20,6 +20,8 @@ export default function Home() {
     const [selectedTweet, setSelectedTweet] = useState(null);
     const [tweetText, setTweetText] = useState("");
     const [isDownloading, setIsDownloading] = useState(false);
+    const [showPriorityModal, setShowPriorityModal] = useState(false);
+    const [selectedPriority, setSelectedPriority] = useState("");
 
 
     useEffect(() => {
@@ -119,6 +121,33 @@ export default function Home() {
         }
     };
     
+    const handleUpdatePriority = async () => {
+        if (!selectedTweet || selectedPriority === "") return;
+
+        const priorityNumber = parseInt(selectedPriority);
+        if (![1, 2, 3].includes(priorityNumber)) return;
+
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/tweets/update-priority/${selectedTweet}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ priority: priorityNumber }),
+            });
+
+            if (response.ok) {
+                setTweets(tweets.map(tweet =>
+                    tweet.tweet_id === selectedTweet ? { ...tweet, priority: priorityNumber } : tweet
+                ));
+            }
+        } catch (err) {
+            console.error("Error al actualizar prioridad:", err);
+        }
+
+        setShowPriorityModal(false);
+        setSelectedTweet(null);
+        setSelectedPriority("");
+    };
+
     if (loading) {
         return (
             <div className="loader-container">
@@ -212,6 +241,18 @@ export default function Home() {
                                             <p>{tweet.tweet_text}</p>
                                             <div className="btns-s d-flex justify-content-center">
                                             <button className='btn-d1 text-center btn btn-primary' onClick={() => { setSelectedTweet(tweet.tweet_id); setTweetText(tweet.tweet_text); setShowEditModal(true); }}>Edit</button>
+                                            
+                                            <button
+                                            className='btn-d3 text-center btn btn-warning'
+                                            onClick={() => {
+                                                setSelectedTweet(tweet.tweet_id);
+                                                setSelectedPriority(tweet.priority);
+                                                setShowPriorityModal(true);
+                                            }}
+                                            >
+                                            Priority: {tweet.priority === 3 ? 'D' : tweet.priority}
+                                            </button>
+
                                             <button className='btn-d2 text-center btn btn-danger' onClick={() => { setSelectedTweet(tweet.tweet_id); setShowDeleteModal(true); }}>Delete</button>
                                             </div>
                                         </div>
@@ -251,6 +292,25 @@ export default function Home() {
                 <Modal.Footer>
                     <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>Cancel</Button>
                     <Button variant="danger" onClick={handleDeleteTweet}>Delete</Button>
+                </Modal.Footer>
+            </Modal>
+
+            <Modal className="modal" show={showPriorityModal} onHide={() => setShowPriorityModal(false)} centered>
+                <Modal.Header closeButton><Modal.Title className="title-priority">Change Priority</Modal.Title></Modal.Header>
+                <Modal.Body>
+                <Form.Select
+                value={selectedPriority}
+                onChange={(e) => setSelectedPriority(e.target.value)}
+                >
+                <option value="">Select priority</option>
+                <option value="1">1 - To Be Posted</option>
+                <option value="2">2 - Not To Be Posted</option>
+                <option value="3">D - Duplicate</option>
+                </Form.Select>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowPriorityModal(false)}>Cancel</Button>
+                    <Button variant="primary" onClick={handleUpdatePriority}>Save</Button>
                 </Modal.Footer>
             </Modal>
 

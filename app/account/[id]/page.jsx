@@ -40,12 +40,14 @@ export default function Home() {
     const [showSettings, setShowSettings] = useState(false);
     const [showEditProfile, setShowEditProfile] = useState(false);
     const [newUsername, setNewUsername] = useState("");
+    const [newName, setNewName] = useState("");
     const [newProfilePic, setNewProfilePic] = useState("");
     const [notes, setNotes] = useState("");
     const [selectedMethod, setSelectedMethod] = useState(null);
 
     const handleOpenEditProfile = () => {
         setNewUsername(userInfo.username || "");
+        setNewName(userInfo.name || "");
         setNewProfilePic(userInfo.profile_pic || "");
         setShowEditProfile(true);
     };
@@ -420,6 +422,8 @@ export default function Home() {
                                         <span className="button-edit" onClick={handleOpenEditProfile}>
                                             <PencilSimple/>
                                         </span>
+                                    </h5>
+                                    <h5 className="profile-name2 mb-2 d-flex align-items-center">{userInfo.name}
                                     </h5>
                                     <div className="profile-stats d-flex flex-wrap justify-content-center justify-content-md-start gap-3">
                                     <div>
@@ -817,6 +821,15 @@ export default function Home() {
                         placeholder="Enter new username"
                     />
                     </Form.Group>
+                    <Form.Group controlId="nameEdit" className="mb-3">
+                    <Form.Control
+                        type="text"
+                        className="input-username-edit"
+                        value={newName}
+                        onChange={(e) => setNewName(e.target.value)}
+                        placeholder="Enter new name"
+                    />
+                    </Form.Group>
 
                     <Button 
                         variant="primary" 
@@ -830,7 +843,8 @@ export default function Home() {
                                     headers: { "Content-Type": "application/json" },
                                     body: JSON.stringify({
                                         username: newUsername,
-                                        profile_pic: newProfilePic
+                                        profile_pic: newProfilePic,
+                                        name: newName
                                     }),
                                 });
 
@@ -841,7 +855,7 @@ export default function Home() {
                                     return;
                                 }
 
-                                setUserInfo({ ...userInfo, username: newUsername, profile_pic: newProfilePic });
+                                setUserInfo({ ...userInfo, username: newUsername, profile_pic: newProfilePic, name: newName });
                                 setShowEditProfile(false);
 
                             } catch (err) {

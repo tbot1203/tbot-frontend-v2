@@ -426,10 +426,15 @@ body{
   }
   
   .profile-name {
-    font-size: 18px;
+    font-size: 17px;
     font-weight: 600;
   }
-  
+
+  .profile-name2 {
+    font-size: 16px;
+    font-weight: 500;
+  }
+
   .profile-stats .label {
     font-size: 13px;
     color: #888;
