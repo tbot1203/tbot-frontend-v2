@@ -44,6 +44,7 @@ export default function Home() {
     const [newProfilePic, setNewProfilePic] = useState("");
     const [notes, setNotes] = useState("");
     const [selectedMethod, setSelectedMethod] = useState(null);
+    const [importFile, setImportFile] = useState(null);
 
     const handleOpenEditProfile = () => {
         setNewUsername(userInfo.username || "");
@@ -285,22 +286,21 @@ export default function Home() {
     const handleCommentKeyDown = (e) => {
         if (e.key === "Enter" && commentInput.trim() !== "") {
             setComments([...comments, commentInput.trim()]);
-            setCommentInput(""); // Limpiar input
+            setCommentInput(""); 
         }
     };
 
     const handleRetweetKeyDown = (e) => {
         if (e.key === "Enter" && retweetInput.trim() !== "") {
             setRetweets([...retweets, retweetInput.trim()]);
-            setRetweetInput(""); // Limpiar input
+            setRetweetInput(""); 
         }
     };
-    // Función para eliminar un usuario de la lista
+
     const removeUser = (index) => {
         setUsers(users.filter((_, i) => i !== index));
     };
 
-    // Función para eliminar una keyword de la lista
     const removeKeyword = (index) => {
         setKeywords(keywords.filter((_, i) => i !== index));
     };
@@ -315,6 +315,108 @@ export default function Home() {
 
     const removeRetweet = (index) => {
         setRetweets(retweets.filter((_, i) => i !== index));
+    };
+
+
+    const handleExportData = () => {
+        const headers = ["type", "value"];
+        const rows = [];
+
+        users.forEach((user) => rows.push(["user", user]));
+        keywords.forEach((kw) => rows.push(["keyword", kw]));
+        likes.forEach((l) => rows.push(["like", l]));
+        comments.forEach((c) => rows.push(["comment", c]));
+        retweets.forEach((r) => rows.push(["retweet", r]));
+
+        rows.push(["custom_style", customStyle]);
+        rows.push(["language", selectedLanguage]);
+        rows.push(["extraction_filter", extractionFilter]);
+        rows.push(["rate_limit", rateLimit]);
+        rows.push(["likes_limit", likesLimit]);
+        rows.push(["comments_limit", commentsLimit]);
+        rows.push(["retweets_limit", retweetsLimit]);
+
+        const csvContent = [headers, ...rows].map((e) => e.join(";")).join("\n");
+
+        const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", `export_${userInfo.username}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
+    const handleImportData = () => {
+        if (!importFile) return;
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const content = event.target.result;
+            const lines = content.split("\n").map((line) => line.trim());
+            const newUsers = [...users];
+            const newKeywords = [...keywords];
+            const newLikes = [...likes];
+            const newComments = [...comments];
+            const newRetweets = [...retweets];
+
+            lines.slice(1).forEach((line) => {
+                const [type, value] = line.split(";").map((s) => s.trim());
+                if (!type || !value) return;
+
+                switch (type) {
+                    case "user":
+                        if (!newUsers.includes(value)) newUsers.push(value);
+                        break;
+                    case "keyword":
+                        if (!newKeywords.includes(value)) newKeywords.push(value);
+                        break;
+                    case "like":
+                        if (!newLikes.includes(value)) newLikes.push(value);
+                        break;
+                    case "comment":
+                        if (!newComments.includes(value)) newComments.push(value);
+                        break;
+                    case "retweet":
+                        if (!newRetweets.includes(value)) newRetweets.push(value);
+                        break;
+                    case "custom_style":
+                        setCustomStyle(value);
+                        break;
+                    case "language":
+                        setSelectedLanguage(value);
+                        break;
+                    case "extraction_filter":
+                        setExtractionFilter(value);
+                        break;
+                    case "rate_limit":
+                        setRateLimit(value);
+                        break;
+                    case "likes_limit":
+                        setLikesLimit(value);
+                        break;
+                    case "comments_limit":
+                        setCommentsLimit(value);
+                        break;
+                    case "retweets_limit":
+                        setRetweetsLimit(value);
+                        break;
+                    default:
+                        break;
+                }
+            });
+
+            setUsers(newUsers);
+            setKeywords(newKeywords);
+            setLikes(newLikes);
+            setComments(newComments);
+            setRetweets(newRetweets);
+
+        };
+
+        reader.readAsText(importFile);
     };
 
     if (loading) {
@@ -423,7 +525,7 @@ export default function Home() {
                                             <PencilSimple/>
                                         </span>
                                     </h5>
-                                    <h5 className="profile-name2 mb-2 d-flex align-items-center">{userInfo.name}
+                                    <h5 className="profile-name2 d-flex align-items-center">{userInfo.name}
                                     </h5>
                                     <div className="profile-stats d-flex flex-wrap justify-content-center justify-content-md-start gap-3">
                                     <div>
@@ -898,7 +1000,7 @@ export default function Home() {
                     <small className="modal-text text-muted">Choose the language in which you want to post.</small>
                     </div>
 
-                    <div>
+                    <div className="mb-4">
                     <h6 className="h-modal">Notes</h6>
                     <Form.Control
                         type="text"
@@ -908,6 +1010,30 @@ export default function Home() {
                         placeholder="Enter account notes"
                     />
                     </div>
+
+                    <div className="mb-4">
+                        <h6 className="h-modal">Import Data</h6>
+                        <Form.Control
+                            type="file"
+                            accept=".csv"
+                            onChange={(e) => setImportFile(e.target.files[0])}
+                        />
+                        <Button 
+                            className="btn-export btn-style-1 w-100 mt-2" 
+                            onClick={handleImportData}
+                            disabled={!importFile}
+                        >
+                            Import CSV
+                        </Button>
+                    </div>
+
+                    <div className="mb-4">
+                        <h6 className="h-modal">Export Data</h6>
+                        <Button className="btn-export btn-style-1 w-100" onClick={handleExportData}>
+                            Export CSV
+                        </Button>
+                    </div>
+
                 </Modal.Body>
             </Modal>
 
