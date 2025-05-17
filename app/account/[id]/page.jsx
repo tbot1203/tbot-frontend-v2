@@ -45,6 +45,7 @@ export default function Home() {
     const [notes, setNotes] = useState("");
     const [selectedMethod, setSelectedMethod] = useState(null);
     const [importFile, setImportFile] = useState(null);
+    const [editProfileError, setEditProfileError] = useState("");
 
     const handleOpenEditProfile = () => {
         setNewUsername(userInfo.username || "");
@@ -939,6 +940,7 @@ export default function Home() {
                         disabled={isUpdatingProfile}
                         onClick={async () => {
                             setIsUpdatingProfile(true);
+                            setEditProfileError("");
                             try {
                                 const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/account/${twitterId}/update-profile`, {
                                     method: "PUT",
@@ -953,7 +955,7 @@ export default function Home() {
                                 const data = await res.json();
 
                                 if (!res.ok) {
-                                    alert("❌ Error al actualizar perfil: " + data.error);
+                                    setEditProfileError(data.error || "Unknown error updating profile");
                                     return;
                                 }
 
@@ -962,7 +964,7 @@ export default function Home() {
 
                             } catch (err) {
                                 console.error("Error al actualizar perfil:", err);
-                                alert("❌ Error inesperado.");
+                                setEditProfileError(data.error || "Unknown error updating profile");
                             } finally {
                                 setIsUpdatingProfile(false);
                             }
@@ -977,6 +979,16 @@ export default function Home() {
                             "Update"
                         )}
                     </Button>
+                    {editProfileError && (
+                    <Alert
+                        variant="danger"
+                        className="alert-update w-100 text-center"
+                        dismissible
+                        onClose={() => setEditProfileError("")}
+                    >
+                        {editProfileError}
+                    </Alert>
+                    )}
                 </Modal.Body>
                 </Modal>
 
