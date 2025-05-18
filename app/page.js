@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { getAccounts, loginWithTwitter } from "../lib/api";
 import { Container, Row, Col, Modal, Nav, Navbar, Spinner, Alert, Button  } from "react-bootstrap";
 import { usePathname } from "next/navigation"; // Importar usePathname
-import { House, ChatText, PlusCircle, Gear , Trash, Monitor, Key, List, TwitterLogo, SignOut, PlayCircle, PauseCircle, ArrowUpRight  } from "phosphor-react";
+import { House, ChatText, PlusCircle, Gear , Trash, ChartLine, Key, List, TwitterLogo, SignOut, PlayCircle, PauseCircle, ArrowUpRight  } from "phosphor-react";
 import './style.css'
 import "bootstrap/dist/css/bootstrap.min.css";
 
@@ -202,6 +202,12 @@ export default function Home() {
               >
                 <Key  size={20} weight="bold" className="me-2" /> API Keys
               </Nav.Link>
+	              <Nav.Link
+	                href="/usages"
+	                className={`textl ${pathname === "/usages" ? "active-link" : ""}`}
+	              >
+	                <ChartLine  size={20} weight="bold" className="me-2" /> Usages
+   	           </Nav.Link>
               <Nav.Link
                 href="/logs"
                 className={`textl ${pathname === "/logs" ? "active-link" : ""}`}

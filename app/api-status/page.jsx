@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Container, Row, Col, Modal, Nav, Navbar, Spinner, Alert, Button  } from "react-bootstrap";
 import { usePathname } from "next/navigation"; // Importar usePathname
-import { House, ChatText, Prohibit , TwitterLogo , Monitor, Key, List, SignOut } from "phosphor-react";
+import { House, ChatText, Prohibit , TwitterLogo , Monitor, Key, List, SignOut, ChartLine} from "phosphor-react";
 import './style.css'
 import "bootstrap/dist/css/bootstrap.min.css";
 
@@ -80,6 +80,12 @@ export default function Home() {
               >
                 <Key  size={20} weight="bold" className="me-2" /> API Keys
               </Nav.Link>
+	              <Nav.Link
+	                href="/usages"
+	                className={`textl ${pathname === "/usages" ? "active-link" : ""}`}
+	              >
+	                <ChartLine  size={20} weight="bold" className="me-2" /> Usages
+   	           </Nav.Link>
               <Nav.Link
                 href="/logs"
                 className={`textl ${pathname === "/logs" ? "active-link" : ""}`}
