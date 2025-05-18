@@ -32,6 +32,7 @@ useEffect(() => {
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/usage/requests-per-day`);
       const data = await res.json();
+      console.log("📊 Data usage:", data);
 
       const getChartData = (apiKey) => {
         const days = Array.from({ length: 7 }, (_, i) => {
@@ -45,6 +46,8 @@ useEffect(() => {
         });
         return days;
       };
+      console.log("📊 Data usage:", getChartData("openrouter"));
+      console.log("📊 Data usage:", getChartData("OPENROUTER"));
 
       setUsageStats({
         openrouter: getChartData("openrouter"),
