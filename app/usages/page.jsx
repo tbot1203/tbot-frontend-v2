@@ -30,7 +30,7 @@ export default function Home() {
 useEffect(() => {
   const fetchUsageData = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/usage/requests-per-day");
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/usage/requests-per-day`);
       const data = await res.json();
 
       const getChartData = (apiKey) => {
