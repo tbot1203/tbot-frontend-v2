@@ -16,10 +16,12 @@ export default function Home() {
     const [posts, setPosts] = useState([]);
     const [rateLimit, setRateLimit] = useState(0);  
     const [likesLimit, setLikesLimit] = useState(0);  
+    const [followsLimit, setFollowsLimit] = useState(0);  
     const [commentsLimit, setCommentsLimit] = useState(0);  
     const [retweetsLimit, setRetweetsLimit] = useState(0);  
     const [likes, setLikes] = useState([]);  
     const [comments, setComments] = useState([]);  
+    const [follows, setFollows] = useState([]);  
     const [retweets, setRetweets] = useState([]);  
     const [extractionFilter, setExtractionFilter] = useState(0);
     const [isRefreshing, setIsRefreshing] = useState(false);
@@ -29,6 +31,7 @@ export default function Home() {
     const [userInput, setUserInput] = useState("");
     const [keywordInput, setKeywordInput] = useState("");
     const [commentInput, setCommentInput] = useState("");
+    const [followInput, setFollowInput] = useState("");
     const [likeInput, setLikeInput] = useState("");
     const [retweetInput, setRetweetInput] = useState("");
     const [userInfo, setUserInfo] = useState("");
@@ -46,6 +49,8 @@ export default function Home() {
     const [selectedMethod, setSelectedMethod] = useState(null);
     const [importFile, setImportFile] = useState(null);
     const [editProfileError, setEditProfileError] = useState("");
+    const [isVerifyingCategory, setIsVerifyingCategory] = useState(false);
+    const [verifyMessage, setVerifyMessage] = useState("");
 
     const handleOpenEditProfile = () => {
         setNewUsername(userInfo.username || "");
@@ -125,11 +130,13 @@ export default function Home() {
                     setLikes(data.likes.map((l) => l.twitter_username));
                     setComments(data.comments.map((c) => c.twitter_username));
                     setRetweets(data.retweets.map((r) => r.twitter_username));
+                    setFollows(data.follows.map((f) => f.twitter_username));
                     setPosts(data.total_posts);
                     setExtractionFilter(data.user.extraction_filter || "cb1"); // suponiendo que lo trae así
                     setLikesLimit(data.user.likes_limit);
                     setCommentsLimit(data.user.comments_limit);
                     setRetweetsLimit(data.user.retweets_limit);
+                    setFollowsLimit(data.user.follows_limit);
                     setSelectedMethod(data.user.extraction_method);
 
                     // 2️⃣ Solo si fetchUser fue exitoso, seguimos con fetchRateLimit
@@ -163,9 +170,41 @@ export default function Home() {
     
     const handleLogout = () => {
         document.cookie = "auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
-        window.location.href = "/admin"; // Redirigir al login
+        window.location.href = "/admin";
     };
-    
+
+    const handleVerifyCategory = async () => {
+        setIsVerifyingCategory(true);
+        setVerifyMessage(""); // Limpiar mensaje anterior
+
+        try {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/account/${twitterId}/verify-category`, {
+                method: "POST",
+            });
+
+            const data = await res.json();
+
+            if (!res.ok || !data.result) {
+                setVerifyMessage(data?.error || "❌ Unknown error verifying category.");
+                return;
+            }
+
+            setUserInfo((prev) => ({
+                ...prev,
+                verified: data.result
+            }));
+
+            setVerifyMessage("✅ Category verification completed.");
+            setShowSettings(false);
+
+        } catch (err) {
+            console.error("❌ Error in handleVerifyCategory:", err);
+            setVerifyMessage("❌ Unexpected error while verifying category.");
+        } finally {
+            setIsVerifyingCategory(false);
+        }
+    };
+
     const handleSave = async () => {
     
         // Validación del rate limit
@@ -189,10 +228,12 @@ export default function Home() {
             extraction_filter: extractionFilter,
             notes: notes,
             likes_limit: likesLimit,
+            follows_limit: followsLimit,
             comments_limit: commentsLimit,
             retweets_limit: retweetsLimit,
             retweets: retweets,
             comments: comments,
+            follows: follows,
             likes: likes,
             extraction_method: selectedMethod,
         };
@@ -250,6 +291,9 @@ export default function Home() {
     const handleLikesLimitChange = (e) => {
         setLikesLimit(e.target.value);
     };
+    const handleFollowsLimitChange = (e) => {
+        setFollowsLimit(e.target.value);
+    };
     const handleCommentsLimitChange = (e) => {
         setCommentsLimit(e.target.value);
     };
@@ -291,6 +335,13 @@ export default function Home() {
         }
     };
 
+    const handleFollowKeyDown = (e) => {
+        if (e.key === "Enter" && followInput.trim() !== "") {
+            setFollows([...follows, followInput.trim()]);
+            setFollowInput(""); 
+        }
+    };
+
     const handleRetweetKeyDown = (e) => {
         if (e.key === "Enter" && retweetInput.trim() !== "") {
             setRetweets([...retweets, retweetInput.trim()]);
@@ -314,6 +365,10 @@ export default function Home() {
         setComments(comments.filter((_, i) => i !== index));
     };
 
+    const removeFollow = (index) => {
+        setFollows(follows.filter((_, i) => i !== index));
+    };
+
     const removeRetweet = (index) => {
         setRetweets(retweets.filter((_, i) => i !== index));
     };
@@ -328,6 +383,7 @@ export default function Home() {
         likes.forEach((l) => rows.push(["like", l]));
         comments.forEach((c) => rows.push(["comment", c]));
         retweets.forEach((r) => rows.push(["retweet", r]));
+        follows.forEach((f) => rows.push(["follow", f]));
 
         rows.push(["custom_style", customStyle]);
         rows.push(["language", selectedLanguage]);
@@ -336,6 +392,7 @@ export default function Home() {
         rows.push(["likes_limit", likesLimit]);
         rows.push(["comments_limit", commentsLimit]);
         rows.push(["retweets_limit", retweetsLimit]);
+        rows.push(["follows_limit", followsLimit]);
 
         const csvContent = [headers, ...rows].map((e) => e.join(";")).join("\n");
 
@@ -362,6 +419,7 @@ export default function Home() {
             const newLikes = [...likes];
             const newComments = [...comments];
             const newRetweets = [...retweets];
+            const newFollows = [...follows];
 
             lines.slice(1).forEach((line) => {
                 const [type, value] = line.split(";").map((s) => s.trim());
@@ -383,6 +441,9 @@ export default function Home() {
                     case "retweet":
                         if (!newRetweets.includes(value)) newRetweets.push(value);
                         break;
+                    case "follow":
+                        if (!newFollows.includes(value)) newFollows.push(value);
+                        break;
                     case "custom_style":
                         setCustomStyle(value);
                         break;
@@ -397,6 +458,9 @@ export default function Home() {
                         break;
                     case "likes_limit":
                         setLikesLimit(value);
+                        break;
+                    case "follows_limit":
+                        setFollowsLimit(value);
                         break;
                     case "comments_limit":
                         setCommentsLimit(value);
@@ -414,7 +478,8 @@ export default function Home() {
             setLikes(newLikes);
             setComments(newComments);
             setRetweets(newRetweets);
-
+            setFollows(newFollows);
+            setShowSettings(false);
         };
 
         reader.readAsText(importFile);
@@ -545,11 +610,21 @@ export default function Home() {
                                     </div>
                                     <div>
                                         <span className="label">Posted</span>
-                                        <div className="value text-center">{posts}</div>
+                                        <div className="value text-center">
+                                            <span className="bubble" onClick={() => window.location.href = `/posted-tweets/${userInfo.id}`}>
+                                                {posts}
+                                            </span>
+                                        </div>
                                     </div>
                                     <div>
-                                        <span className="label">Status</span>
-                                        <div className="value text-center">{userInfo.status}</div>
+                                        <span className="label">Category</span>
+                                        <div className={`value text-center ${userInfo.verified === "1" ? "green" : userInfo.verified === "0" ? "red" : "gray"}`}>
+                                        {userInfo.verified === "1"
+                                            ? "Verified"
+                                            : userInfo.verified === "0"
+                                            ? "Rejected"
+                                            : "Pending"}
+                                        </div>
                                     </div>
                                     </div>
                                 </div>
@@ -557,7 +632,7 @@ export default function Home() {
 
                                 <div className="ai-score-circle text-center mt-4 mt-md-0">
                                 <div className="score-label">AI Score</div>
-                                <div className="score-value"><strong>-</strong>/100</div>
+                                <div className="score-value"><strong>{userInfo.ai_score}</strong>/100</div>
                                 </div>
 
                             </div>
@@ -804,6 +879,43 @@ export default function Home() {
                             ))}
                             </div>
 
+                         {/* Input de Follows */}
+                         <h1 className="d-flex justify-content-center title-section-init title-function mb-4">Follow Users</h1>
+                            
+                            <div className="d-flex justify-content-center col-12 col-md-12">
+
+                            <input
+                                    className="input-style-1 i2"
+                                    placeholder="Write the users you want to comment and press Enter Key."
+                                    name="keywords"
+                                    type="text"
+                                    value={followInput}
+                                    onChange={(e) => setFollowInput(e.target.value)}
+                                    onKeyDown={handleFollowKeyDown}
+                                />
+                            </div>
+
+                            {/* Badges de Keywords */}
+                            <div className="row-badge">
+                            {follows.map((keyword, index) => (
+                                <div key={index}>
+                                <OverlayTrigger
+                                    placement="top"
+                                    overlay={
+                                        <Tooltip id={`comment-tooltip-${index}`}>
+                                            @{keyword}
+                                        </Tooltip>
+                                    }
+                                >
+                                    <Badge pill bg="" className="badge-style" style={{ cursor: "pointer" }}>
+                                        <span onClick={() => removeFollow(index)} style={{ cursor: "pointer" }}>✖</span> @{keyword}
+                                    </Badge>
+                                </OverlayTrigger>
+                                </div>
+                            ))}
+                            </div>
+
+
                             <div className="new-section container text-center mt-5">
                                 <h1 className="title-function">Rate Limits</h1>
 
@@ -826,6 +938,17 @@ export default function Home() {
                                             className="form-control"
                                             value={likesLimit}
                                             onChange={handleLikesLimitChange}
+                                            min="1"
+                                            max="10"
+                                        />
+                                    </div>
+                                    <div className="rate-block d-flex flex-column align-items-center">
+                                        <p className="p-api mb-1">Follows</p>
+                                        <input 
+                                            type="number" 
+                                            className="form-control"
+                                            value={followsLimit}
+                                            onChange={handleFollowsLimitChange}
                                             min="1"
                                             max="10"
                                         />
@@ -1051,6 +1174,33 @@ export default function Home() {
                             Export CSV
                         </Button>
                     </div>
+
+                    <div className="mb-4">
+                        <h6 className="h-modal">Verify Category</h6>
+                        <Button 
+                            className="btn-style-1 w-100" 
+                            onClick={handleVerifyCategory}
+                            disabled={isVerifyingCategory}
+                        >
+                            {isVerifyingCategory ? (
+                                <>
+                                    <Spinner animation="border" size="sm" className="me-2" /> Verifying...
+                                </>
+                            ) : (
+                                "Verify Category"
+                            )}
+                        </Button>
+                    </div>
+                    {verifyMessage && (
+                        <Alert
+                            variant={verifyMessage.includes("✅") ? "success" : "danger"}
+                            className="mt-4 text-center"
+                            dismissible
+                            onClose={() => setVerifyMessage("")}
+                        >
+                            {verifyMessage}
+                        </Alert>
+                    )}
 
                 </Modal.Body>
             </Modal>

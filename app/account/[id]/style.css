@@ -424,7 +424,30 @@ body{
     border-radius: 50%;
     object-fit: cover;
   }
-  
+
+  .value.green {
+    color: #28a745;
+  }
+
+  .value.red {
+    color: #dc3545;
+  }
+
+  .value.gray {
+    color: #6c757d;
+  }
+
+  .bubble {
+    transition:  0.3s ease;
+    color: #1d1d1d;
+  }
+
+  .bubble:hover{
+    color: #0056b3;
+    transition:  0.3s ease;
+    cursor: pointer;
+  }
+
   .profile-name {
     font-size: 17px;
     font-weight: 600;

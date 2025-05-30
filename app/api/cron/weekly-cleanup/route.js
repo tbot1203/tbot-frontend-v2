@@ -5,7 +5,7 @@ export async function GET() {
 
   try {
     const response = await fetch(API_URL, {
-      method: "DELETE"
+      method: "POST"
     });
 
     const data = await response.json();
