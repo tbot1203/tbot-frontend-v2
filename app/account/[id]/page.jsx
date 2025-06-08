@@ -92,27 +92,31 @@ export default function Home() {
         }
     
     };
-    
+        
     useEffect(() => {
         const pathSegments = pathname.split("/");
         const twitterId = pathSegments[pathSegments.length - 1];
         setTwitterId(twitterId);
+
         const fetchLanguages = async () => {
             try {
-                const response = await fetch("https://restcountries.com/v3.1/all");
+                const response = await fetch("https://restcountries.com/v3.1/all?fields=languages");
                 const data = await response.json();
-    
+
                 const languageSet = new Set();
+
                 data.forEach((country) => {
                     if (country.languages) {
                         Object.values(country.languages).forEach((lang) => languageSet.add(lang));
                     }
                 });
+
                 setLanguages([...languageSet].sort());
             } catch (error) {
                 console.error("Error fetching languages:", error);
             }
         };
+
     
         const fetchUserThenRateLimit = async () => {
             try {
