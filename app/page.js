@@ -352,6 +352,7 @@ export default function Home() {
                         <th>Account</th>
                         <th className="hide-on-mobile">Rate Limit</th>
                         <th className="hide-on-mobile">Followers</th>
+                        <th>Extracted</th>
                         <th>Last Post</th>
                         <th>Process</th>
                       </tr>
