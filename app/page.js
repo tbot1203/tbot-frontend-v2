@@ -44,11 +44,11 @@ export default function Home() {
       const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
 
       if (diffHours < 24) {
-        return `hace ${diffHours} ${diffHours === 1 ? 'hora' : 'horas'}`;
+        return `${diffHours} ${diffHours === 1 ? 'hour ago' : 'hours ago'}`;
       }
 
       const diffDays = Math.floor(diffHours / 24);
-      return `hace ${diffDays} ${diffDays === 1 ? 'día' : 'días'}`;
+      return `${diffDays} ${diffDays === 1 ? 'day ago' : 'days ago'}`;
     };
 
     useEffect(() => {
@@ -370,9 +370,6 @@ export default function Home() {
                             <span className="bubble" onClick={() => window.location.href = `/tweets/${acc.id}`}>
                               {acc.collected_tweets}
                             </span>
-                          </td>
-                          <td className="hide-on-mobile" onClick={() => window.location.href = `/account/${acc.twitter_id}`}>
-                            {formatTimeAgo(acc.last_extract)}
                           </td>
                           <td className="hide-on-mobile" onClick={() => window.location.href = `/account/${acc.twitter_id}`}>
                             {formatTimeAgo(acc.last_post)}
