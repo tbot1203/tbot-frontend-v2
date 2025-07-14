@@ -10,18 +10,18 @@ import './style.css'
 import "bootstrap/dist/css/bootstrap.min.css";
 
 export default function Home() {
-    const [accounts, setAccounts] = useState([]); // 🔹 Siempre inicializa como un array
+    const [accounts, setAccounts] = useState([]);
     const router = useRouter();
     const [isSidebarOpen, setSidebarOpen] = useState(true);
-    const [loading, setLoading] = useState(true); // Estado para el loader
+    const [loading, setLoading] = useState(true); 
     const [messages, setMessages] = useState([]);
-    const pathname = usePathname(); // Obtener la URL actual
+    const pathname = usePathname(); 
     const [showModal, setShowModal] = useState(false);
     const [selectedAccount, setSelectedAccount] = useState(null);
-    const [isFetching, setIsFetching] = useState(false);  // Estado para saber si el proceso está activo
+    const [isFetching, setIsFetching] = useState(false); 
     const [activeIndex, setActiveIndex] = useState(null);
     const [showAddAccountModal, setShowAddAccountModal] = useState(false);
-    const [individualProcesses, setIndividualProcesses] = useState({});  // { userId: true/false }
+    const [individualProcesses, setIndividualProcesses] = useState({});  
     const [disabledProcessButtons, setDisabledProcessButtons] = useState(false);
     
     const toggleProcess = (index) => {
@@ -34,7 +34,23 @@ export default function Home() {
     const handleCloseAddAccount = () => {
       setShowAddAccountModal(false);
     };
-    
+
+    const formatTimeAgo = (timestamp) => {
+      if (!timestamp) return "-";
+
+      const now = new Date();
+      const date = new Date(timestamp);
+      const diffMs = now.getTime() - date.getTime();
+      const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+
+      if (diffHours < 24) {
+        return `hace ${diffHours} ${diffHours === 1 ? 'hora' : 'horas'}`;
+      }
+
+      const diffDays = Math.floor(diffHours / 24);
+      return `hace ${diffDays} ${diffDays === 1 ? 'día' : 'días'}`;
+    };
+
     useEffect(() => {
       const fetchAccounts = async () => {
           try {
@@ -336,7 +352,8 @@ export default function Home() {
                         <th>Account</th>
                         <th className="hide-on-mobile">Rate Limit</th>
                         <th className="hide-on-mobile">Followers</th>
-                        <th>To Be Posted</th>
+                        <th>Last Extract</th>
+                        <th>Last Post</th>
                         <th>Process</th>
                       </tr>
                     </thead>
@@ -353,6 +370,12 @@ export default function Home() {
                             <span className="bubble" onClick={() => window.location.href = `/tweets/${acc.id}`}>
                               {acc.collected_tweets}
                             </span>
+                          </td>
+                          <td className="hide-on-mobile" onClick={() => window.location.href = `/account/${acc.twitter_id}`}>
+                            {formatTimeAgo(acc.last_extract)}
+                          </td>
+                          <td className="hide-on-mobile" onClick={() => window.location.href = `/account/${acc.twitter_id}`}>
+                            {formatTimeAgo(acc.last_post)}
                           </td>
                           <td>
                             <button 
