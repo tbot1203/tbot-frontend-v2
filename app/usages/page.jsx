@@ -14,7 +14,6 @@ export default function Home() {
   const [windowWidth, setWindowWidth] = useState(0);
   const [usageStats, setUsageStats] = useState({
     openrouter: [],
-    socialdata: [],
     rapidapi: []
   });
 
@@ -46,12 +45,9 @@ useEffect(() => {
         });
         return days;
       };
-      console.log("📊 Data usage:", getChartData("openrouter"));
-      console.log("📊 Data usage:", getChartData("OPENROUTER"));
 
       setUsageStats({
         openrouter: getChartData("openrouter"),
-        socialdata: getChartData("socialdata"),
         rapidapi: getChartData("rapidapi")
       });
     } catch (err) {
@@ -146,7 +142,6 @@ useEffect(() => {
           <Row>
             <Col md={12}>
               {renderChart("OpenRouter Requests (Last 7 Days)", usageStats.openrouter)}
-              {renderChart("SocialData Requests (Last 7 Days)", usageStats.socialdata)}
               {renderChart("RapidAPI Requests (Last 7 Days)", usageStats.rapidapi)}
             </Col>
           </Row>
