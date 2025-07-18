@@ -41,8 +41,17 @@ export default function Home() {
       const now = new Date();
       const date = new Date(timestamp);
       const diffMs = now.getTime() - date.getTime();
-      const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+      const diffMinutes = Math.floor(diffMs / (1000 * 60));
 
+      if (diffMinutes < 1) {
+        return "just now";
+      }
+
+      if (diffMinutes < 60) {
+        return `${diffMinutes} ${diffMinutes === 1 ? 'minute ago' : 'minutes ago'}`;
+      }
+
+      const diffHours = Math.floor(diffMinutes / 60);
       if (diffHours < 24) {
         return `${diffHours} ${diffHours === 1 ? 'hour ago' : 'hours ago'}`;
       }
@@ -317,7 +326,6 @@ export default function Home() {
               <div className="api-status-container d-flex flex-wrap mb-4">
                 {[
                   { name: "OpenRouter", status: true },
-                  { name: "Social Data", status: true },
                   { name: "Rapid API", status: true },
                   { name: "Posting", status: isFetching }  // Usa tu estado actual
                 ].map((api, index) => (
@@ -353,6 +361,7 @@ export default function Home() {
                         <th className="hide-on-mobile">Rate Limit</th>
                         <th className="hide-on-mobile">Followers</th>
                         <th>Extracted</th>
+                        <th>Last Extract</th>
                         <th>Last Post</th>
                         <th>Process</th>
                       </tr>
@@ -370,6 +379,9 @@ export default function Home() {
                             <span className="bubble" onClick={() => window.location.href = `/tweets/${acc.id}`}>
                               {acc.collected_tweets}
                             </span>
+                          </td>
+                          <td className="hide-on-mobile" onClick={() => window.location.href = `/account/${acc.twitter_id}`}>
+                            {formatTimeAgo(acc.last_extract)}
                           </td>
                           <td className="hide-on-mobile" onClick={() => window.location.href = `/account/${acc.twitter_id}`}>
                             {formatTimeAgo(acc.last_post)}
