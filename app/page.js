@@ -40,7 +40,12 @@ export default function Home() {
 
       const now = new Date();
       const date = new Date(timestamp);
-      const diffMs = now.getTime() - date.getTime();
+
+      // Ajustar +5:30 para India
+      const istOffsetMs = (5 * 60 + 30) * 60 * 1000; // 5 horas 30 minutos en milisegundos
+      const adjustedDate = new Date(date.getTime() + istOffsetMs);
+
+      const diffMs = now.getTime() - adjustedDate.getTime();
       const diffMinutes = Math.floor(diffMs / (1000 * 60));
 
       if (diffMinutes < 1) {
@@ -48,18 +53,18 @@ export default function Home() {
       }
 
       if (diffMinutes < 60) {
-        return `${diffMinutes} ${diffMinutes === 1 ? 'minute ago' : 'minutes ago'}`;
+        return `${diffMinutes} ${diffMinutes === 1 ? "minute ago" : "minutes ago"}`;
       }
 
       const diffHours = Math.floor(diffMinutes / 60);
       if (diffHours < 24) {
-        return `${diffHours} ${diffHours === 1 ? 'hour ago' : 'hours ago'}`;
+        return `${diffHours} ${diffHours === 1 ? "hour ago" : "hours ago"}`;
       }
 
       const diffDays = Math.floor(diffHours / 24);
-      return `${diffDays} ${diffDays === 1 ? 'day ago' : 'days ago'}`;
+      return `${diffDays} ${diffDays === 1 ? "day ago" : "days ago"}`;
     };
-
+    
     useEffect(() => {
       const fetchAccounts = async () => {
           try {
