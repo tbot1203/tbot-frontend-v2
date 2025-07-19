@@ -2,12 +2,16 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getAccounts, loginWithTwitter } from "../lib/api";
-import { Container, Row, Col, Modal, Nav, Navbar, Spinner, Alert, Button  } from "react-bootstrap";
+import { getAccounts } from "../lib/api";
+import { Container, Row, Modal, Nav, Navbar, Spinner, Button  } from "react-bootstrap";
 import { usePathname } from "next/navigation"; // Importar usePathname
-import { House, ChatText, PlusCircle, Gear , Trash, ChartLine, Key, List, TwitterLogo, SignOut, PlayCircle, PauseCircle, ArrowUpRight  } from "phosphor-react";
+import { House, ChatText, PlusCircle, Gear , Trash, ChartLine, Key, List, SignOut, PlayCircle, PauseCircle  } from "phosphor-react";
 import './style.css'
 import "bootstrap/dist/css/bootstrap.min.css";
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+
+dayjs.extend(utc);
 
 export default function Home() {
     const [accounts, setAccounts] = useState([]);
@@ -38,31 +42,18 @@ export default function Home() {
     const formatTimeAgo = (timestamp) => {
       if (!timestamp) return "-";
 
-      const now = new Date();
-      const date = new Date(timestamp);
+      const now = dayjs();
+      const date = dayjs.utc(timestamp).local(); // lo convierte de UTC a hora local
+      const diffMinutes = now.diff(date, 'minute');
 
-      // Ajustar +5:30 para India
-      const istOffsetMs = (5 * 60 + 30) * 60 * 1000; // 5 horas 30 minutos en milisegundos
-      const adjustedDate = new Date(date.getTime() + istOffsetMs);
-
-      const diffMs = now.getTime() - adjustedDate.getTime();
-      const diffMinutes = Math.floor(diffMs / (1000 * 60));
-
-      if (diffMinutes < 1) {
-        return "just now";
-      }
-
-      if (diffMinutes < 60) {
-        return `${diffMinutes} ${diffMinutes === 1 ? "minute ago" : "minutes ago"}`;
-      }
+      if (diffMinutes < 1) return "just now";
+      if (diffMinutes < 60) return `${diffMinutes} ${diffMinutes === 1 ? 'minute ago' : 'minutes ago'}`;
 
       const diffHours = Math.floor(diffMinutes / 60);
-      if (diffHours < 24) {
-        return `${diffHours} ${diffHours === 1 ? "hour ago" : "hours ago"}`;
-      }
+      if (diffHours < 24) return `${diffHours} ${diffHours === 1 ? 'hour ago' : 'hours ago'}`;
 
       const diffDays = Math.floor(diffHours / 24);
-      return `${diffDays} ${diffDays === 1 ? "day ago" : "days ago"}`;
+      return `${diffDays} ${diffDays === 1 ? 'day ago' : 'days ago'}`;
     };
     
     useEffect(() => {
