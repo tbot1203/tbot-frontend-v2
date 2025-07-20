@@ -2,8 +2,6 @@
 
 body{
     background-color: #FFFFFF !important;
-    transform: scale(0.9);
-    transform-origin: top center;
 }
 
 .textl:hover{
