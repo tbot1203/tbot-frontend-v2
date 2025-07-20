@@ -43,17 +43,17 @@ export default function Home() {
       if (!timestamp) return "-";
 
       const now = dayjs();
-      const date = dayjs.utc(timestamp).local(); // lo convierte de UTC a hora local
+      const date = dayjs.utc(timestamp).local();
       const diffMinutes = now.diff(date, 'minute');
 
-      if (diffMinutes < 1) return "just now";
-      if (diffMinutes < 60) return `${diffMinutes} ${diffMinutes === 1 ? 'minute ago' : 'minutes ago'}`;
+      if (diffMinutes < 1) return "1m";
+      if (diffMinutes < 60) return `${diffMinutes}m`;
 
-      const diffHours = Math.floor(diffMinutes / 60);
-      if (diffHours < 24) return `${diffHours} ${diffHours === 1 ? 'hour ago' : 'hours ago'}`;
+      const diffHours = now.diff(date, 'hour');
+      if (diffHours < 24) return `${diffHours}h`;
 
-      const diffDays = Math.floor(diffHours / 24);
-      return `${diffDays} ${diffDays === 1 ? 'day ago' : 'days ago'}`;
+      const diffDays = now.diff(date, 'day');
+      return `${diffDays}d`;
     };
     
     useEffect(() => {
@@ -357,8 +357,8 @@ export default function Home() {
                         <th className="hide-on-mobile">Rate Limit</th>
                         <th className="hide-on-mobile">Followers</th>
                         <th>Extracted</th>
-                        <th>Last Extract</th>
-                        <th>Last Post</th>
+                        <th className="hide-on-mobile">Last Extract</th>
+                        <th className="hide-on-mobile">Last Post</th>
                         <th>Process</th>
                       </tr>
                     </thead>
@@ -369,7 +369,7 @@ export default function Home() {
                             <img src={acc.profile_pic || "https://avatar.iran.liara.run/public/boy"} alt="avatar" className="avatar" />
                             <span className="username-td">@{acc.username}</span>
                           </td>
-                          <td className="hide-on-mobile" onClick={() => window.location.href = `/account/${acc.twitter_id}`}>{acc.rate_limit} per hour</td>
+                          <td className="hide-on-mobile" onClick={() => window.location.href = `/account/${acc.twitter_id}`}>{acc.rate_limit}</td>
                           <td className="hide-on-mobile" onClick={() => window.location.href = `/account/${acc.twitter_id}`}>{acc.followers}</td>
                           <td>
                             <span className="bubble" onClick={() => window.location.href = `/tweets/${acc.id}`}>
