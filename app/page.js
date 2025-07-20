@@ -10,6 +10,7 @@ import './style.css'
 import "bootstrap/dist/css/bootstrap.min.css";
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
+import Sidebar from "@/components/Sidebar";
 
 dayjs.extend(utc);
 

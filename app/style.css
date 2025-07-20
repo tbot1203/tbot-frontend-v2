@@ -2,7 +2,9 @@
 
 body{
     background-color: #FFFFFF !important;
+    zoom: 90%;
 }
+
 
 .textl:hover{
     color: #215eb4;
@@ -455,7 +457,16 @@ body{
     justify-content: center !important;
   }
 }
-
+@media (max-width: 700px) {
+  .api-status-container{
+  max-width: 75%;
+  }
+}
+@media (max-width: 860px) {
+  .api-status-container{
+  max-width: 70%;
+  }
+}
 
 @media (max-width: 770px) {
   .btn-account-ps2{
