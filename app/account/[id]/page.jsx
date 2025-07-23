@@ -742,26 +742,25 @@ export default function Home() {
 
                             <div className="new-section container text-center mt-5">
                                 <h1 className="title-function">Select an Extraction Method</h1>
-                                <div className="filter-toggle-group d-flex flex-wrap justify-content-center gap-2">
+                                    <div className="filter-toggle-group d-flex flex-wrap justify-content-center gap-2">
                                     {[1, 2, 3].map((num) => (
-                                    <div className="col-auto" key={num}>
+                                        <div className="col-auto" key={num}>
                                         <input
-                                        type="radio"
-                                        className="filter-radio-input"
-                                        name="method"
-                                        id={`method${num}`}
-                                        autoComplete="off"
-                                        value={num}  
-                                        checked={selectedMethod === num}
-                                        onChange={handleMethodChange}
+                                            type="radio"
+                                            className="filter-radio-input"
+                                            name="method"
+                                            id={`method${num}`}
+                                            autoComplete="off"
+                                            value={num}
+                                            checked={selectedMethod === num}
+                                            onChange={handleMethodChange}
                                         />
                                         <label className="filter-radio-label" htmlFor={`method${num}`}>
-                                        Method {num}
+                                            {num === 1 ? "Selective" : num === 2 ? "Replicative" : "Storage"}
                                         </label>
-                                    </div>
+                                        </div>
                                     ))}
-
-                                </div>
+                                    </div>
 
                             </div>
 
