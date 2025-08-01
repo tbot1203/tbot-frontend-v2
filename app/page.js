@@ -324,7 +324,7 @@ export default function Home() {
                 {[
                   { name: "OpenRouter", status: true },
                   { name: "Rapid API", status: true },
-                  { name: "Posting", status: isFetching }  // Usa tu estado actual
+                  { name: "Posting", status: isFetching }
                 ].map((api, index) => (
                   <div key={index} className="api-box d-flex align-items-center justify-content-center">
                     {api.name}
