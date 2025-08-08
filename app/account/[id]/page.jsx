@@ -937,9 +937,9 @@ export default function Home() {
                                 </div>
                             </div>
 
-                            <div className="new-section d-flex justify-content-center mt-4 gap-2">
+                            <div className="new-section d-flex justify-content-center mt-6 gap-2">
                                 <Button
-                                className="btn-style-1"
+                                className="btn-save btn-style-1"
                                 onClick={handleCreateJob}
                                 disabled={creatingJob || !userInfo?.id}
                                 >
@@ -950,21 +950,6 @@ export default function Home() {
                                     </>
                                 ) : (
                                     "Create Job"
-                                )}
-                                </Button>
-
-                                <Button
-                                variant="outline-secondary"
-                                onClick={fetchLatestJob}
-                                disabled={jobLoading}
-                                >
-                                {jobLoading ? (
-                                    <>
-                                    <Spinner animation="border" size="sm" className="me-2" />
-                                    Refresh
-                                    </>
-                                ) : (
-                                    "Refresh"
                                 )}
                                 </Button>
                             </div>
