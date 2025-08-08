@@ -937,7 +937,7 @@ export default function Home() {
                                 </div>
                             </div>
 
-                            <div className="new-section d-flex justify-content-center mt-6 gap-2">
+                            <div className="d-flex justify-content-center">
                                 <Button
                                 className="btn-save btn-style-1"
                                 onClick={handleCreateJob}
@@ -967,16 +967,16 @@ export default function Home() {
                                 </div>
                             )}
 
-                            <div className="new-section d-flex justify-content-center mt-3">
+                            <div className="new-section d-flex justify-content-center mt-4">
                                 <div className="col-12 col-md-8">
-                                <div className="profile-card px-4 py-3">
+                                <div className=" px-4 py-3">
                                     <h6 className="mb-3">Last Created Job</h6>
 
                                     {!latestJob ? (
                                     <p className="mb-0 text-muted">No jobs found.</p>
                                     ) : (
-                                    <div className="d-flex flex-column flex-md-row justify-content-between align-items-start gap-3">
-                                        <div>
+                                    <div className="d-flex flex-column justify-content-center align-items-start gap-3">
+                                        <div className="text-center">
                                         <div><strong>ID:</strong> {latestJob.id}</div>
                                         <div><strong>Status:</strong> {latestJob.status}</div>
                                         <div><strong>Scope:</strong> {latestJob.scope}</div>
