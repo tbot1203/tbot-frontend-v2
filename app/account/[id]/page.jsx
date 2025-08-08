@@ -51,15 +51,6 @@ export default function Home() {
     const [editProfileError, setEditProfileError] = useState("");
     const [isVerifyingCategory, setIsVerifyingCategory] = useState(false);
     const [verifyMessage, setVerifyMessage] = useState("");
-    const [dateFrom, setDateFrom] = useState("");
-    const [dateTo, setDateTo] = useState("");
-    const [maxItems, setMaxItems] = useState(2000);
-    const [scope, setScope] = useState("users_keywords");
-    const [latestJob, setLatestJob] = useState(null);
-    const [jobLoading, setJobLoading] = useState(false);
-    const [jobMessage, setJobMessage] = useState("");
-    const [creatingJob, setCreatingJob] = useState(false);
-    const [deletingJob, setDeletingJob] = useState(false);
 
     const handleOpenEditProfile = () => {
         setNewUsername(userInfo.username || "");
@@ -71,112 +62,6 @@ export default function Home() {
     const handleCloseEditProfile = () => setShowEditProfile(false);    
     const handleOpenSettings = () => setShowSettings(true);
     const handleCloseSettings = () => setShowSettings(false);
-    const fetchLatestJob = async () => {
-    if (!userInfo?.id) return;
-    setJobLoading(true);
-    try {
-        const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/custom-extracts/latest?user_id=${userInfo.id}`
-        );
-        const data = await res.json();
-        if (res.ok && data?.id) {
-        setLatestJob(data);
-        } else {
-        setLatestJob(null);
-        }
-    } catch (e) {
-        console.error("Error fetching latest job:", e);
-    } finally {
-        setJobLoading(false);
-    }
-    };
-
-    // Crear job
-    const handleCreateJob = async () => {
-    setJobMessage("");
-
-    if (!dateFrom || !dateTo) {
-        setJobMessage("Choose Date From & Date To.");
-        return;
-    }
-    const df = new Date(dateFrom);
-    const dt = new Date(dateTo);
-    if (isNaN(df.getTime()) || isNaN(dt.getTime())) {
-        setJobMessage("Invalid dates.");
-        return;
-    }
-    if (df >= dt) {
-        setJobMessage("Date From must be lower than Date To.");
-        return;
-    }
-    if (Number(maxItems) < 1 || Number(maxItems) > 2000) {
-        setJobMessage("Max Items must be between 1 y 2000.");
-        return;
-    }
-
-    setCreatingJob(true);
-    try {
-        // Formato "YYYY-MM-DD HH:mm:ss" que tu backend ya soporta
-        const fmt = (d) => d.toISOString().slice(0, 19).replace("T", " ");
-        const body = {
-        user_id: userInfo.id,
-        date_from: fmt(df),
-        date_to: fmt(dt),
-        max_items: Number(maxItems),
-        scope
-        };
-
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/custom-extracts`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body)
-        });
-        const data = await res.json();
-
-        if (!res.ok) {
-        setJobMessage(data?.error || "Error creating job.");
-        return;
-        }
-
-        setJobMessage("Job created succesfully.");
-        await fetchLatestJob();
-    } catch (e) {
-        console.error("Error creating job:", e);
-        setJobMessage("Unexpected error creating job.");
-    } finally {
-        setCreatingJob(false);
-    }
-    };
-
-    // Borrar job pendiente
-    const handleDeleteJob = async () => {
-    if (!latestJob || latestJob.status !== "pending") return;
-    setDeletingJob(true);
-    try {
-        const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/custom-extracts/${latestJob.id}`,
-        { method: "DELETE" }
-        );
-        const data = await res.json().catch(() => ({}));
-        if (!res.ok) {
-        setJobMessage(data?.error || "Error deleting job.");
-        return;
-        }
-        setJobMessage("Job deleted.");
-        setLatestJob(null);
-    } catch (e) {
-        console.error("Error deleting job:", e);
-        setJobMessage("Unexpected error deleting job.");
-    } finally {
-        setDeletingJob(false);
-    }
-    };
-
-    // Traer el último job cuando ya tenemos el userInfo.id
-    useEffect(() => {
-    if (userInfo?.id) fetchLatestJob();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [userInfo?.id]);
 
     const handleRefreshProfile = async () => {
         setIsRefreshing(true);
@@ -200,8 +85,8 @@ export default function Home() {
             }
     
         } catch (err) {
-            console.error("Error:", err);
-            alert("❌ Error.");
+            console.error("Error al refrescar perfil:", err);
+            alert("❌ Error inesperado al refrescar perfil.");
         }finally {
             setIsRefreshing(false);
         }
@@ -856,27 +741,26 @@ export default function Home() {
                             </div> */}
 
                             <div className="new-section container text-center mt-5">
-                                <h1 className="title-function">Select an Extraction Method</h1>
-                                    <div className="filter-toggle-group d-flex flex-wrap justify-content-center gap-2">
-                                    {[1, 2, 3].map((num) => (
-                                        <div className="col-auto" key={num}>
+                            <h1 className="title-function">Select an Extraction Method</h1>
+                                <div className="filter-toggle-group d-flex flex-wrap justify-content-center gap-2">
+                                    {[1, 2].map((num) => (
+                                    <div className="col-auto" key={num}>
                                         <input
-                                            type="radio"
-                                            className="filter-radio-input"
-                                            name="method"
-                                            id={`method${num}`}
-                                            autoComplete="off"
-                                            value={num}
-                                            checked={selectedMethod === num}
-                                            onChange={handleMethodChange}
+                                        type="radio"
+                                        className="filter-radio-input"
+                                        name="method"
+                                        id={`method${num}`}
+                                        autoComplete="off"
+                                        value={num}
+                                        checked={selectedMethod === num}
+                                        onChange={handleMethodChange}
                                         />
                                         <label className="filter-radio-label" htmlFor={`method${num}`}>
-                                            {num === 1 ? "Selective" : num === 2 ? "Replicative" : "Storage"}
+                                        {num === 1 ? "Selective" : "Replicative"}
                                         </label>
-                                        </div>
-                                    ))}
                                     </div>
-
+                                    ))}
+                                </div>
                             </div>
 
 
@@ -886,127 +770,6 @@ export default function Home() {
                                 value={customStyle}  // Valor inicial desde userInfo
                                 onChange={(e) => setCustomStyle(e.target.value)}  // Actualiza el estado
                                 placeholder="Customize your tweets however you prefer..." name="style-prompt" type="text" />
-                            </div>
-
-                            <div className="new-section container text-center mt-5">
-                            <h1 className="title-function">Custom One Time Extract</h1>
-                            <div className="row g-3 justify-content-center">
-                                <div className="col-12 col-md-3">
-                                <label className="form-label">Date From</label>
-                                <input
-                                    type="datetime-local"
-                                    className="form-control"
-                                    value={dateFrom}
-                                    onChange={(e) => setDateFrom(e.target.value)}
-                                />
-                                </div>
-
-                                <div className="col-12 col-md-3">
-                                <label className="form-label">Date To</label>
-                                <input
-                                    type="datetime-local"
-                                    className="form-control"
-                                    value={dateTo}
-                                    onChange={(e) => setDateTo(e.target.value)}
-                                />
-                                </div>
-                            </div>
-                            <div className="row g-3 mt-3 justify-content-center">
-
-                                <div className="col-12 col-md-3">
-                                <label className="form-label">Max Items</label>
-                                <input
-                                    type="number"
-                                    className="form-control"
-                                    min={1}
-                                    max={2000}
-                                    value={maxItems}
-                                    onChange={(e) => setMaxItems(Number(e.target.value))}
-                                />
-                                </div>
-
-                                <div className="col-12 col-md-3">
-                                <label className="form-label">Scope</label>
-                                <Form.Select
-                                value={scope}
-                                onChange={(e) => setScope(e.target.value)}
-                                >
-                                    <option value="users_keywords">Users + Keywords</option>
-                                    <option value="keywords_only">Keywords Only</option>
-                                </Form.Select>
-                                </div>
-                            </div>
-
-                            <div className="d-flex justify-content-center">
-                                <Button
-                                className="btn-save btn-style-1"
-                                onClick={handleCreateJob}
-                                disabled={creatingJob || !userInfo?.id}
-                                >
-                                {creatingJob ? (
-                                    <>
-                                    <Spinner animation="border" size="sm" className="me-2" />
-                                    </>
-                                ) : (
-                                    "Create Job"
-                                )}
-                                </Button>
-                            </div>
-
-                            {jobMessage && (
-                                <div className="new-section d-flex justify-content-center col-12 col-md-6 mt-3">
-                                <Alert
-                                    variant={jobMessage.toLowerCase().includes("error") ? "danger" : "success"}
-                                    className="w-100 text-center"
-                                    dismissible
-                                    onClose={() => setJobMessage("")}
-                                >
-                                    {jobMessage}
-                                </Alert>
-                                </div>
-                            )}
-
-                            <div className="new-section d-flex justify-content-center mt-4">
-                                <div className="col-12 col-md-8">
-                                <div className=" px-4 py-3">
-                                    <h6 className="mb-3">Last Created Job</h6>
-
-                                    {!latestJob ? (
-                                    <p className="mb-0 text-muted">No jobs found.</p>
-                                    ) : (
-                                    <div className="d-flex flex-column justify-content-center align-items-center gap-3">
-                                        <div className="text-center">
-                                        <div><strong>ID:</strong> {latestJob.id}</div>
-                                        <div><strong>Status:</strong> {latestJob.status}</div>
-                                        <div><strong>Scope:</strong> {latestJob.scope}</div>
-                                        <div>
-                                            <strong>Range:</strong>{" "}
-                                            {latestJob.date_from} to {latestJob.date_to}
-                                        </div>
-                                        <div><strong>Max Items:</strong> {latestJob.max_items}</div>
-                                        <div><strong>Extracted:</strong> {latestJob.extracted_count}</div>
-                                        </div>
-
-                                        <div className="justify-content-center mt-2 d-flex gap-2">
-                                        <Button
-                                            variant="outline-danger"
-                                            onClick={handleDeleteJob}
-                                            disabled={latestJob.status !== "pending" || deletingJob}
-                                        >
-                                            {deletingJob ? (
-                                            <>
-                                                <Spinner animation="border" size="sm" className="me-2" />
-                                            </>
-                                            ) : (
-                                            "Delete Job"
-                                            )}
-                                        </Button>
-                                        </div>
-                                    </div>
-                                    )}
-                                </div>
-                                </div>
-                            </div>
                             </div>
 
                          {/* Input de Likes */}
