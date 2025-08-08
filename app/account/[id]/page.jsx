@@ -887,9 +887,9 @@ export default function Home() {
                                 onChange={(e) => setCustomStyle(e.target.value)}  // Actualiza el estado
                                 placeholder="Customize your tweets however you prefer..." name="style-prompt" type="text" />
                             </div>
+
                             <div className="new-section container text-center mt-5">
                             <h1 className="title-function">Custom One Time Extract</h1>
-
                             <div className="row g-3 justify-content-center">
                                 <div className="col-12 col-md-3">
                                 <label className="form-label">Date From</label>
@@ -910,6 +910,8 @@ export default function Home() {
                                     onChange={(e) => setDateTo(e.target.value)}
                                 />
                                 </div>
+                            </div>
+                            <div className="row g-3 justify-content-center">
 
                                 <div className="col-12 col-md-2">
                                 <label className="form-label">Max Items</label>
