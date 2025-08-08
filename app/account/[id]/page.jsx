@@ -905,7 +905,7 @@ export default function Home() {
                                 <label className="form-label">Date To</label>
                                 <input
                                     type="datetime-local"
-                                    className="p-api form-control"
+                                    className="form-control"
                                     value={dateTo}
                                     onChange={(e) => setDateTo(e.target.value)}
                                 />
@@ -917,7 +917,7 @@ export default function Home() {
                                 <label className="form-label">Max Items</label>
                                 <input
                                     type="number"
-                                    className="p-api form-control"
+                                    className="form-control"
                                     min={1}
                                     max={2000}
                                     value={maxItems}
@@ -970,7 +970,7 @@ export default function Home() {
                             </div>
 
                             {jobMessage && (
-                                <div className="d-flex justify-content-center col-12 col-md-8 mt-3">
+                                <div className="new-section d-flex justify-content-center col-12 col-md-6 mt-3">
                                 <Alert
                                     variant={jobMessage.toLowerCase().includes("error") ? "danger" : "success"}
                                     className="w-100 text-center"
@@ -982,7 +982,7 @@ export default function Home() {
                                 </div>
                             )}
 
-                            <div className="d-flex justify-content-center mt-3">
+                            <div className="new-section d-flex justify-content-center mt-3">
                                 <div className="col-12 col-md-8">
                                 <div className="profile-card px-4 py-3">
                                     <h6 className="mb-3">Last Created Job</h6>
