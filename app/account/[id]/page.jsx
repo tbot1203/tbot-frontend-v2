@@ -905,19 +905,19 @@ export default function Home() {
                                 <label className="form-label">Date To</label>
                                 <input
                                     type="datetime-local"
-                                    className="form-control"
+                                    className="p-api form-control"
                                     value={dateTo}
                                     onChange={(e) => setDateTo(e.target.value)}
                                 />
                                 </div>
                             </div>
-                            <div className="row g-3 justify-content-center">
+                            <div className="row g-3 mt-3 justify-content-center">
 
-                                <div className="col-12 col-md-2">
+                                <div className="col-12 col-md-3">
                                 <label className="form-label">Max Items</label>
                                 <input
                                     type="number"
-                                    className="form-control"
+                                    className="p-api form-control"
                                     min={1}
                                     max={2000}
                                     value={maxItems}
