@@ -51,6 +51,15 @@ export default function Home() {
     const [editProfileError, setEditProfileError] = useState("");
     const [isVerifyingCategory, setIsVerifyingCategory] = useState(false);
     const [verifyMessage, setVerifyMessage] = useState("");
+    const [dateFrom, setDateFrom] = useState<string>("");
+    const [dateTo, setDateTo] = useState<string>("");
+    const [maxItems, setMaxItems] = useState<number>(2000);
+    const [scope, setScope] = useState("users_keywords");
+    const [latestJob, setLatestJob] = useState<any>(null);
+    const [jobLoading, setJobLoading] = useState<boolean>(false);
+    const [jobMessage, setJobMessage] = useState<string>("");
+    const [creatingJob, setCreatingJob] = useState<boolean>(false);
+    const [deletingJob, setDeletingJob] = useState<boolean>(false);
 
     const handleOpenEditProfile = () => {
         setNewUsername(userInfo.username || "");
@@ -62,6 +71,112 @@ export default function Home() {
     const handleCloseEditProfile = () => setShowEditProfile(false);    
     const handleOpenSettings = () => setShowSettings(true);
     const handleCloseSettings = () => setShowSettings(false);
+    const fetchLatestJob = async () => {
+    if (!userInfo?.id) return;
+    setJobLoading(true);
+    try {
+        const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/custom-extracts/latest?user_id=${userInfo.id}`
+        );
+        const data = await res.json();
+        if (res.ok && data?.id) {
+        setLatestJob(data);
+        } else {
+        setLatestJob(null);
+        }
+    } catch (e) {
+        console.error("Error fetching latest job:", e);
+    } finally {
+        setJobLoading(false);
+    }
+    };
+
+    // Crear job
+    const handleCreateJob = async () => {
+    setJobMessage("");
+
+    if (!dateFrom || !dateTo) {
+        setJobMessage("Elegí Date From y Date To.");
+        return;
+    }
+    const df = new Date(dateFrom);
+    const dt = new Date(dateTo);
+    if (isNaN(df.getTime()) || isNaN(dt.getTime())) {
+        setJobMessage("Fechas inválidas.");
+        return;
+    }
+    if (df >= dt) {
+        setJobMessage("Date From debe ser anterior a Date To.");
+        return;
+    }
+    if (Number(maxItems) < 1 || Number(maxItems) > 2000) {
+        setJobMessage("Max Items debe estar entre 1 y 2000.");
+        return;
+    }
+
+    setCreatingJob(true);
+    try {
+        // Formato "YYYY-MM-DD HH:mm:ss" que tu backend ya soporta
+        const fmt = (d) => d.toISOString().slice(0, 19).replace("T", " ");
+        const body = {
+        user_id: userInfo.id,
+        date_from: fmt(df),
+        date_to: fmt(dt),
+        max_items: Number(maxItems),
+        scope
+        };
+
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/custom-extracts`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+        setJobMessage(data?.error || "Error creando el job.");
+        return;
+        }
+
+        setJobMessage("Job creado correctamente.");
+        await fetchLatestJob();
+    } catch (e) {
+        console.error("Error creating job:", e);
+        setJobMessage("Error inesperado creando el job.");
+    } finally {
+        setCreatingJob(false);
+    }
+    };
+
+    // Borrar job pendiente
+    const handleDeleteJob = async () => {
+    if (!latestJob || latestJob.status !== "pending") return;
+    setDeletingJob(true);
+    try {
+        const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/custom-extracts/${latestJob.id}`,
+        { method: "DELETE" }
+        );
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+        setJobMessage(data?.error || "Error borrando el job.");
+        return;
+        }
+        setJobMessage("Job borrado.");
+        setLatestJob(null);
+    } catch (e) {
+        console.error("Error deleting job:", e);
+        setJobMessage("Error inesperado borrando el job.");
+    } finally {
+        setDeletingJob(false);
+    }
+    };
+
+    // Traer el último job cuando ya tenemos el userInfo.id
+    useEffect(() => {
+    if (userInfo?.id) fetchLatestJob();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [userInfo?.id]);
 
     const handleRefreshProfile = async () => {
         setIsRefreshing(true);
@@ -771,6 +886,142 @@ export default function Home() {
                                 value={customStyle}  // Valor inicial desde userInfo
                                 onChange={(e) => setCustomStyle(e.target.value)}  // Actualiza el estado
                                 placeholder="Customize your tweets however you prefer..." name="style-prompt" type="text" />
+                            </div>
+                            <div className="new-section container text-center mt-5">
+                            <h1 className="title-function">Custom One Time Extract</h1>
+
+                            <div className="row g-3 justify-content-center">
+                                <div className="col-12 col-md-3">
+                                <label className="form-label">Date From</label>
+                                <input
+                                    type="datetime-local"
+                                    className="form-control"
+                                    value={dateFrom}
+                                    onChange={(e) => setDateFrom(e.target.value)}
+                                />
+                                </div>
+
+                                <div className="col-12 col-md-3">
+                                <label className="form-label">Date To</label>
+                                <input
+                                    type="datetime-local"
+                                    className="form-control"
+                                    value={dateTo}
+                                    onChange={(e) => setDateTo(e.target.value)}
+                                />
+                                </div>
+
+                                <div className="col-12 col-md-2">
+                                <label className="form-label">Max Items</label>
+                                <input
+                                    type="number"
+                                    className="form-control"
+                                    min={1}
+                                    max={2000}
+                                    value={maxItems}
+                                    onChange={(e) => setMaxItems(Number(e.target.value))}
+                                />
+                                </div>
+
+                                <div className="col-12 col-md-3">
+                                <label className="form-label">Scope</label>
+                                <Form.Select
+                                value={scope}
+                                onChange={(e) => setScope(e.target.value)}
+                                >
+                                    <option value="users_keywords">Users + Keywords</option>
+                                    <option value="keywords_only">Keywords Only</option>
+                                </Form.Select>
+                                </div>
+                            </div>
+
+                            <div className="d-flex justify-content-center mt-4 gap-2">
+                                <Button
+                                className="btn-style-1"
+                                onClick={handleCreateJob}
+                                disabled={creatingJob || !userInfo?.id}
+                                >
+                                {creatingJob ? (
+                                    <>
+                                    <Spinner animation="border" size="sm" className="me-2" />
+                                    Creating...
+                                    </>
+                                ) : (
+                                    "Create Job"
+                                )}
+                                </Button>
+
+                                <Button
+                                variant="outline-secondary"
+                                onClick={fetchLatestJob}
+                                disabled={jobLoading}
+                                >
+                                {jobLoading ? (
+                                    <>
+                                    <Spinner animation="border" size="sm" className="me-2" />
+                                    Refresh
+                                    </>
+                                ) : (
+                                    "Refresh"
+                                )}
+                                </Button>
+                            </div>
+
+                            {jobMessage && (
+                                <div className="d-flex justify-content-center col-12 col-md-8 mt-3">
+                                <Alert
+                                    variant={jobMessage.toLowerCase().includes("error") ? "danger" : "success"}
+                                    className="w-100 text-center"
+                                    dismissible
+                                    onClose={() => setJobMessage("")}
+                                >
+                                    {jobMessage}
+                                </Alert>
+                                </div>
+                            )}
+
+                            <div className="d-flex justify-content-center mt-3">
+                                <div className="col-12 col-md-8">
+                                <div className="profile-card px-4 py-3">
+                                    <h6 className="mb-3">Last Created Job</h6>
+
+                                    {!latestJob ? (
+                                    <p className="mb-0 text-muted">No jobs found.</p>
+                                    ) : (
+                                    <div className="d-flex flex-column flex-md-row justify-content-between align-items-start gap-3">
+                                        <div>
+                                        <div><strong>ID:</strong> {latestJob.id}</div>
+                                        <div><strong>Status:</strong> {latestJob.status}</div>
+                                        <div><strong>Scope:</strong> {latestJob.scope}</div>
+                                        <div>
+                                            <strong>Range:</strong>{" "}
+                                            {latestJob.date_from} to {latestJob.date_to}
+                                        </div>
+                                        <div><strong>Max Items:</strong> {latestJob.max_items}</div>
+                                        <div><strong>Extracted:</strong> {latestJob.extracted_count}</div>
+                                        </div>
+
+                                        <div className="d-flex gap-2">
+                                        <Button
+                                            variant="outline-danger"
+                                            onClick={handleDeleteJob}
+                                            disabled={latestJob.status !== "pending" || deletingJob}
+                                        >
+                                            {deletingJob ? (
+                                            <>
+                                                <Spinner animation="border" size="sm" className="me-2" />
+                                                Deleting...
+                                            </>
+                                            ) : (
+                                            "Delete Job"
+                                            )}
+                                        </Button>
+                                        </div>
+                                    </div>
+                                    )}
+                                </div>
+                                </div>
+                            </div>
                             </div>
 
                          {/* Input de Likes */}
