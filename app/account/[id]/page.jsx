@@ -96,21 +96,21 @@ export default function Home() {
     setJobMessage("");
 
     if (!dateFrom || !dateTo) {
-        setJobMessage("Elegí Date From y Date To.");
+        setJobMessage("Choose Date From & Date To.");
         return;
     }
     const df = new Date(dateFrom);
     const dt = new Date(dateTo);
     if (isNaN(df.getTime()) || isNaN(dt.getTime())) {
-        setJobMessage("Fechas inválidas.");
+        setJobMessage("Invalid dates.");
         return;
     }
     if (df >= dt) {
-        setJobMessage("Date From debe ser anterior a Date To.");
+        setJobMessage("Date From must be lower than Date To.");
         return;
     }
     if (Number(maxItems) < 1 || Number(maxItems) > 2000) {
-        setJobMessage("Max Items debe estar entre 1 y 2000.");
+        setJobMessage("Max Items must be between 1 y 2000.");
         return;
     }
 
@@ -134,15 +134,15 @@ export default function Home() {
         const data = await res.json();
 
         if (!res.ok) {
-        setJobMessage(data?.error || "Error creando el job.");
+        setJobMessage(data?.error || "Error creating job.");
         return;
         }
 
-        setJobMessage("Job creado correctamente.");
+        setJobMessage("Job created succesfully.");
         await fetchLatestJob();
     } catch (e) {
         console.error("Error creating job:", e);
-        setJobMessage("Error inesperado creando el job.");
+        setJobMessage("Unexpected error creating job.");
     } finally {
         setCreatingJob(false);
     }
@@ -159,14 +159,14 @@ export default function Home() {
         );
         const data = await res.json().catch(() => ({}));
         if (!res.ok) {
-        setJobMessage(data?.error || "Error borrando el job.");
+        setJobMessage(data?.error || "Error deleting job.");
         return;
         }
-        setJobMessage("Job borrado.");
+        setJobMessage("Job deleted.");
         setLatestJob(null);
     } catch (e) {
         console.error("Error deleting job:", e);
-        setJobMessage("Error inesperado borrando el job.");
+        setJobMessage("Unexpected error deleting job.");
     } finally {
         setDeletingJob(false);
     }
@@ -200,8 +200,8 @@ export default function Home() {
             }
     
         } catch (err) {
-            console.error("Error al refrescar perfil:", err);
-            alert("❌ Error inesperado al refrescar perfil.");
+            console.error("Error:", err);
+            alert("❌ Error.");
         }finally {
             setIsRefreshing(false);
         }
@@ -935,7 +935,7 @@ export default function Home() {
                                 </div>
                             </div>
 
-                            <div className="d-flex justify-content-center mt-4 gap-2">
+                            <div className="new-section d-flex justify-content-center mt-4 gap-2">
                                 <Button
                                 className="btn-style-1"
                                 onClick={handleCreateJob}
