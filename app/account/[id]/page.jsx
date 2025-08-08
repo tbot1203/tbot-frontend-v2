@@ -946,7 +946,6 @@ export default function Home() {
                                 {creatingJob ? (
                                     <>
                                     <Spinner animation="border" size="sm" className="me-2" />
-                                    Creating...
                                     </>
                                 ) : (
                                     "Create Job"
@@ -975,7 +974,7 @@ export default function Home() {
                                     {!latestJob ? (
                                     <p className="mb-0 text-muted">No jobs found.</p>
                                     ) : (
-                                    <div className="d-flex flex-column justify-content-center align-items-start gap-3">
+                                    <div className="d-flex flex-column justify-content-center align-items-center gap-3">
                                         <div className="text-center">
                                         <div><strong>ID:</strong> {latestJob.id}</div>
                                         <div><strong>Status:</strong> {latestJob.status}</div>
@@ -988,7 +987,7 @@ export default function Home() {
                                         <div><strong>Extracted:</strong> {latestJob.extracted_count}</div>
                                         </div>
 
-                                        <div className="d-flex gap-2">
+                                        <div className="justify-content-center mt-2 d-flex gap-2">
                                         <Button
                                             variant="outline-danger"
                                             onClick={handleDeleteJob}
@@ -997,7 +996,6 @@ export default function Home() {
                                             {deletingJob ? (
                                             <>
                                                 <Spinner animation="border" size="sm" className="me-2" />
-                                                Deleting...
                                             </>
                                             ) : (
                                             "Delete Job"
