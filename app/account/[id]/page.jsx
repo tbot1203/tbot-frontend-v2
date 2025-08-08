@@ -51,15 +51,15 @@ export default function Home() {
     const [editProfileError, setEditProfileError] = useState("");
     const [isVerifyingCategory, setIsVerifyingCategory] = useState(false);
     const [verifyMessage, setVerifyMessage] = useState("");
-    const [dateFrom, setDateFrom] = useState<string>("");
-    const [dateTo, setDateTo] = useState<string>("");
-    const [maxItems, setMaxItems] = useState<number>(2000);
+    const [dateFrom, setDateFrom] = useState("");
+    const [dateTo, setDateTo] = useState("");
+    const [maxItems, setMaxItems] = useState(2000);
     const [scope, setScope] = useState("users_keywords");
-    const [latestJob, setLatestJob] = useState<any>(null);
-    const [jobLoading, setJobLoading] = useState<boolean>(false);
-    const [jobMessage, setJobMessage] = useState<string>("");
-    const [creatingJob, setCreatingJob] = useState<boolean>(false);
-    const [deletingJob, setDeletingJob] = useState<boolean>(false);
+    const [latestJob, setLatestJob] = useState(null);
+    const [jobLoading, setJobLoading] = useState(false);
+    const [jobMessage, setJobMessage] = useState("");
+    const [creatingJob, setCreatingJob] = useState(false);
+    const [deletingJob, setDeletingJob] = useState(false);
 
     const handleOpenEditProfile = () => {
         setNewUsername(userInfo.username || "");
